@@ -4,7 +4,7 @@ var React = require('react');
 var Home =
     React.createClass({
         render:function() {
-            return <div>Home Screen</div>
+            return <div>Home Screen(test jenkins)</div>
         }
     });
 
