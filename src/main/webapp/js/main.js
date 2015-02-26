@@ -19831,6 +19831,7 @@ module.exports = require('./lib/React');
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
+var Footer = require('./footer/footer.js');
 
 var Template =
     React.createClass({displayName: "Template",
@@ -19838,7 +19839,8 @@ var Template =
             return (
                 React.createElement("div", {className: "container"}, 
                     React.createElement(Header, null), 
-                    this.props.children
+                    this.props.children, 
+                    React.createElement(Footer, null)
                 )
             )
         }
@@ -19846,7 +19848,7 @@ var Template =
 
 module.exports = Template;
 
-},{"./header/header.js":173,"react":170}],172:[function(require,module,exports){
+},{"./footer/footer.js":173,"./header/header.js":174,"react":170}],172:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Login = require('./login.js');
@@ -19873,7 +19875,22 @@ var App =
 
 module.exports = App;
 
-},{"./app-template.js":171,"./home.js":174,"./login.js":175,"react":170,"react-router-component":4}],173:[function(require,module,exports){
+},{"./app-template.js":171,"./home.js":175,"./login.js":176,"react":170,"react-router-component":4}],173:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var Footer =
+    React.createClass({displayName: "Footer",
+        render:function() {
+            return React.createElement("div", null, 
+                React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {src: "powered-by-gcp.png"}))
+            )
+        }
+    });
+
+module.exports = Footer;
+
+},{"react":170}],174:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -19891,7 +19908,7 @@ var Header =
 
 module.exports = Header;
 
-},{"react":170}],174:[function(require,module,exports){
+},{"react":170}],175:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -19904,7 +19921,7 @@ var Home =
 
 module.exports = Home;
 
-},{"react":170}],175:[function(require,module,exports){
+},{"react":170}],176:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -19917,7 +19934,7 @@ var Login =
 
 module.exports = Login;
 
-},{"react":170}],176:[function(require,module,exports){
+},{"react":170}],177:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -19927,4 +19944,4 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":172,"react":170}]},{},[176])
+},{"./components/app":172,"react":170}]},{},[177])

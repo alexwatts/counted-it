@@ -2,7 +2,8 @@
     if (typeof window.janrain !== 'object') window.janrain = {};
     if (typeof window.janrain.settings !== 'object') window.janrain.settings = {};
 
-    janrain.settings.tokenUrl = 'http://counted.it/janrain/token';
+    //janrain.settings.tokenUrl = 'http://counted.it/janrain/token';
+    janrain.settings.tokenUrl = 'http://localhost:8080/janrain/token';
 
     function isReady() {
         janrain.ready = true;
