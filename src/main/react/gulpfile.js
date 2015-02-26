@@ -10,11 +10,9 @@ gulp.task('browserify', function() {
 });
 
 gulp.task('copy', function() {
-    gulp.src('src/index.html')
+    gulp.src('src/favicon.ico')
         .pipe(gulp.dest('../webapp'));
 
-    gulp.src('src/login.html')
-        .pipe(gulp.dest('../webapp'));
 });
 
 gulp.task('copy-janrain', function() {
