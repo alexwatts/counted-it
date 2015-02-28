@@ -2,8 +2,10 @@ package com.whats.login;
 
 import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 
+import java.io.Serializable;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JanrainAuth {
+public class JanrainAuth implements Serializable {
 
     public JanrainAuth() {
 

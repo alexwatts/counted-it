@@ -42,6 +42,7 @@
     </bean>
 
     <bean id="mainController" class="com.whats.controller.main.MainController">
+        <property name="objectMapper" ref="objectMapper"/>
     </bean>
 
     <bean id="urlFetchService" class="com.whats.service.urlfetch.URLFetchServiceImpl">
