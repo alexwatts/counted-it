@@ -22511,34 +22511,36 @@ var Header =
         },
         render:function() {
             return React.createElement("div", {className: "row"}, 
-                    React.createElement("nav", {className: "navbar navbar-default"}, 
-                        React.createElement("div", {className: "container-fluid"}, 
-                            React.createElement("div", {className: "navbar-header"}, 
-                                React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#counted—it-navbar-collapse-1"}, 
-        React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
-        React.createElement("span", {className: "icon-bar"}), 
-        React.createElement("span", {className: "icon-bar"}), 
-        React.createElement("span", {className: "icon-bar"})
-      ), 
-      React.createElement("a", {className: "navbar-brand", href: "#"}, "Counted It")
-                                ), 
-                                    React.createElement("div", {className: "collapse navbar-collapse", id: "counted-it-navbar-collapse-1"}, 
-      React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
-        React.createElement("li", null, React.createElement("a", {href: "#"}), this.state.profile.profile.displayName), 
-        React.createElement("li", {className: "dropdown"}, 
-          React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, "Dropdown ", React.createElement("span", {className: "caret"})), 
+                React.createElement("nav", {className: "navbar navbar-default"}, 
+                    React.createElement("div", {className: "container-fluid"}, 
+                        React.createElement("div", {className: "navbar-header"}, 
+                            React.createElement("button", {type: "button", className: "navbar-toggle collapsed", "data-toggle": "collapse", "data-target": "#bs-example-navbar-collapse-1"}, 
+                                React.createElement("span", {className: "sr-only"}, "Toggle navigation"), 
+                                React.createElement("span", {className: "icon-bar"}), 
+                                React.createElement("span", {className: "icon-bar"}), 
+                                React.createElement("span", {className: "icon-bar"})
+                            ), 
+                            React.createElement("a", {className: "navbar-brand", href: "#"}, "Counted It")
+                        ), 
+
+                        React.createElement("div", {className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1"}, 
+                            React.createElement("ul", {className: "nav navbar-nav"}, 
+                                React.createElement("li", {className: "active"}, React.createElement("a", {href: "#"}, "Count Something ", React.createElement("span", {className: "sr-only"}, "(current)"))), 
+                                React.createElement("li", null, React.createElement("a", {href: "#"}, "Shared Counts"))
+                            ), 
+                            React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
+                                React.createElement("li", {className: "dropdown"}, 
+                                    React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.state.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Action")), 
-                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Another action")), 
-                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Something else here")), 
+                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Profile")), 
                                         React.createElement("li", {className: "divider"}), 
-                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Separated link"))
+                                        React.createElement("li", null, React.createElement("a", {href: "/logout"}, "Logout"))
                                     )
                                 )
                             )
+                            )
                         )
                     )
-                )
             )
         }
     });
