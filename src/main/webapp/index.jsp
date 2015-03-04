@@ -5,7 +5,7 @@
 <%@ page isELIgnored="false" %>
 
 <script>
-    auth = <c:out value="${auth}"/>
+    auth = <c:out value="${auth}" escapeXml="false"/>
 </script>
 
 <!DOCTYPE html>

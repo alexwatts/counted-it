@@ -4,9 +4,12 @@ var React = require('react');
 var Footer =
     React.createClass({
         render:function() {
-            return <div>
-                <a href="https://cloud.google.com/"><img src="powered-by-gcp.png"></img></a>
-            </div>
+            return <nav className="navbar navbar-default navbar-fixed-bottom">
+                    <div className="container">
+                        <a href="https://cloud.google.com/"><img className="footer" src="powered-by-gcp.png"></img></a>
+                    </div>
+                </nav>
+
         }
     });
 

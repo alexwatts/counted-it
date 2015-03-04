@@ -2,16 +2,10 @@ var AppConstants = require('../constants/app-constants.js');
 var AppDispatcher = require('../dispatchers/app-dispatcher.js');
 
 var AppActions = {
-    loginSuccess:function(auth){
+    updateProfile:function(profile){
         AppDispatcher.handleViewAction({
-            actionType: AppConstants.LOGIN_SUCCESS,
-            item: auth
-        })
-    },
-    loginFailiure:function(response){
-        AppDispatcher.handleViewAction({
-            actionType: AppConstants.LOGIN_FAILURE,
-            item: response
+            actionType: AppConstants.UPDATE_PROFILE,
+            profile: profile
         })
     }
 }

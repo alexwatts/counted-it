@@ -19897,10 +19897,13 @@ var React = require('react');
 var Header =
     React.createClass({displayName: "Header",
         render:function() {
-            return React.createElement("div", null, 
-                React.createElement("a", {href: "login.html", 
-                    className: "btn btn-success"}, 
-                    "Login"
+            return
+            React.createElement("div", {class: "row"}, 
+                React.createElement("div", {class: ""}, 
+                    React.createElement("a", {href: "logout", 
+                        className: "btn btn-success"}, 
+                        "Logout"
+                    )
                 )
             )
         }

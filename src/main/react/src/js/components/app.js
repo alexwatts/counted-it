@@ -4,12 +4,17 @@ var Login = require('./login.js');
 var Home = require('./home.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
+var AppActions = require('../actions/app-actions');
+var API = require('../util/api.js');
 
 var Locations = Router.Locations;
 var Location = Router.Location;
 
 var App =
     React.createClass({
+        componentDidMount:function(){
+            AppActions.updateProfile(API.getProfile());
+        },
         render:function() {
             return (
                 <Template>
