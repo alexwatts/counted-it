@@ -34,6 +34,7 @@ var Header =
                         <div className="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                             <ul className="nav navbar-nav">
                                 <li className="active"><a href="#">Count Something <span className="sr-only">(current)</span></a></li>
+                                <li><a href="#">My Counts</a></li>
                                 <li><a href="#">Shared Counts</a></li>
                             </ul>
                             <ul className="nav navbar-nav navbar-right">

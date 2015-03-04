@@ -22554,7 +22554,13 @@ var React = require('react');
 var Home =
     React.createClass({displayName: "Home",
         render:function() {
-            return React.createElement("div", null, "Home Screen(test jenkins)")
+            return React.createElement("div", {className: "jumbotron"}, 
+                React.createElement("h1", null, "Welcome to Counted It!"), 
+                React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
+                "in your life. You can use it to count things you are doing yourself, or you can count" + ' ' +
+                "things with other people"), 
+                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "#", role: "button"}, "Start Counting"))
+            )
         }
     });
 

@@ -4,14 +4,9 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page isELIgnored="false" %>
 
-<script>
-    auth = <c:out value="${auth}" escapeXml="false"/>
-</script>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
     <meta charset="UTF8">
     <title>Document</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">

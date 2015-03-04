@@ -22526,6 +22526,7 @@ var Header =
                         React.createElement("div", {className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1"}, 
                             React.createElement("ul", {className: "nav navbar-nav"}, 
                                 React.createElement("li", {className: "active"}, React.createElement("a", {href: "#"}, "Count Something ", React.createElement("span", {className: "sr-only"}, "(current)"))), 
+                                React.createElement("li", null, React.createElement("a", {href: "#"}, "My Counts")), 
                                 React.createElement("li", null, React.createElement("a", {href: "#"}, "Shared Counts"))
                             ), 
                             React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
@@ -22554,7 +22555,13 @@ var React = require('react');
 var Home =
     React.createClass({displayName: "Home",
         render:function() {
-            return React.createElement("div", null, "Home Screen(test jenkins)")
+            return React.createElement("div", {className: "jumbotron"}, 
+                React.createElement("h1", null, "Welcome to Counted It!"), 
+                React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
+                "in your life. You can use it to count things you are doing yourself, or you can count" + ' ' +
+                "things with other people"), 
+                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "#", role: "button"}, "Start Counting"))
+            )
         }
     });
 
