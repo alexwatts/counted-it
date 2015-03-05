@@ -1,5 +1,6 @@
 package com.whats.controller.main;
 
+import com.whats.login.JanrainAuth;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,10 +35,42 @@ public class MainController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "profile", method = RequestMethod.GET)
+    @ResponseBody
+    public JanrainAuth getAuth(HttpServletRequest request) {
+
+        return (JanrainAuth) request.getSession().getAttribute("auth");
+
+    }
+
     @RequestMapping(value = "login", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView login() {
         return new ModelAndView("login");
+    }
+
+    @RequestMapping(value = "count", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView count() {
+        return new ModelAndView("index");
+    }
+
+    @RequestMapping(value = "my-counts", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView myCounts() {
+        return new ModelAndView("index");
+    }
+
+    @RequestMapping(value = "my-profile", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView myProfile() {
+        return new ModelAndView("index");
+    }
+
+    @RequestMapping(value = "shared-counts", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView sharedCounts() {
+        return new ModelAndView("index");
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {

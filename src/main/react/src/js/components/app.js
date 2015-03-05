@@ -5,9 +5,9 @@ var Home = require('./home.js');
 var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
 var SharedCounts = require('./shared-counts.js');
+var SharedCounts = require('./my-profile.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
-var AppActions = require('../actions/app-actions');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
 
@@ -22,7 +22,7 @@ var App =
     React.createClass({
         componentDidMount:function(){
             //Initialise profile object
-            AppActions.updateProfile(API.getProfile());
+            API.getProfile();
         },
         componentWillMount:function(){
             //Listen for updates to the store for profile object
@@ -42,6 +42,7 @@ var App =
                         <Location path="/count" handler={CountSomething}></Location>
                         <Location path="/my-counts" handler={MyCounts}></Location>
                         <Location path="/shared-counts" handler={SharedCounts}></Location>
+                        <Location path="/my-profile" handler={MyProfile}></Location>
                     </Locations>
                 </Template>
             )
