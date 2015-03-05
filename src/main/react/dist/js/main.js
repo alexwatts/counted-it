@@ -22419,6 +22419,18 @@ var AppActions = {
             actionType: AppConstants.COUNT_ADDED,
             count: count
         })
+    },
+    updateMyCounts:function(counts){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_MY_COUNTS,
+            counts: counts
+        })
+    },
+    updatePage:function(page){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_PAGE,
+            page: page
+        })
     }
 }
 
@@ -22435,7 +22447,7 @@ var Template =
         render:function(){
             return (
                 React.createElement("div", {className: "container-fluid"}, 
-                    React.createElement(Header, {profile: this.props.profile}), 
+                    React.createElement(Header, {profile: this.props.profile, page: this.props.page}), 
                     this.props.children, 
                     React.createElement(Footer, null)
                 )
@@ -22458,6 +22470,10 @@ var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
+var CountStore = require('../stores/count-store.js');
+var PageStore = require('../stores/page-store.js');
+var merge  = require('react/lib/merge');
+
 
 var Locations = Router.Locations;
 var Location = Router.Location;
@@ -22465,26 +22481,41 @@ var Location = Router.Location;
 function profile(){
     return {profile: AppStore.getProfile()}
 }
+function myCounts(){
+    return {myCounts: CountStore.getMyCounts()}
+}
+function page(){
+    return {page: PageStore.getPage()}
+}
 
 var App =
     React.createClass({displayName: "App",
         componentDidMount:function(){
-            //Initialise profile object
+            //Initialise store objects
             API.getProfile();
+            API.getMyCounts();
         },
         componentWillMount:function(){
-            //Listen for updates to the store for profile object
-            AppStore.addChangeListener(this._onChange)
+            //Listen for updates from the stores
+            AppStore.addChangeListener(this._onProfileChange);
+            CountStore.addChangeListener(this._onCountsChange)
+            PageStore.addChangeListener(this._onPageChange)
         },
         getInitialState:function(){
-            return profile();
+            return merge(profile(), myCounts(), page());
         },
-        _onChange:function(){
+        _onProfileChange:function(){
             this.setState(profile())
+        },
+        _onCountsChange:function(){
+            this.setState(myCounts())
+        },
+        _onPageChange:function(){
+            this.setState(page())
         },
         render:function() {
             return (
-                React.createElement(Template, {profile: this.state.profile}, 
+                React.createElement(Template, {profile: this.state.profile, page: this.state.page}, 
                     React.createElement(Locations, null, 
                         React.createElement(Location, {path: "/", handler: Home}), 
                         React.createElement(Location, {path: "/count", handler: CountSomething}), 
@@ -22499,24 +22530,47 @@ var App =
 
 module.exports = App;
 
-},{"../stores/app-store.js":192,"../util/api.js":193,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6}],180:[function(require,module,exports){
+},{"../stores/app-store.js":192,"../stores/count-store.js":193,"../stores/page-store.js":194,"../util/api.js":195,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+var Link = require('react-router-component').Link;
+var API = require('../util/api.js');
+var AppActions = require('../actions/app-actions.js');
 
 var CountSomething =
     React.createClass({displayName: "CountSomething",
+        getInitialState: function () {
+            return {
+                countType: '',
+                countText: ''
+            }
+        },
+        handleChange: function (name, e) {
+            var change = {};
+            change[name] = e.target.value;
+            this.setState(change);
+        },
+        handleClick: function (name, e) {
+            var change = {};
+            change[name] = e.target.text;
+            this.setState(change);
+        },
+        handleCreate: function () {
+            API.createCount(this.state.countType, this.state.countText);
+            AppActions.updatePage('MyCounts');
+        },
         render:function() {
 
-            return React.createElement("div", null, 
+            return  React.createElement("div", null, 
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
                                     React.createElement("span", {className: "input-group-addon minw70"}, "Type"), 
-                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""}), 
+                                    React.createElement("input", {disabled: true, type: "text", className: "form-control", "aria-label": "", value: this.state.countType}), 
                                     React.createElement("div", {className: "input-group-btn"}, 
                                         React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false"}, " ", React.createElement("span", {className: "caret"})), 
                                         React.createElement("ul", {className: "dropdown-menu dropdown-menu-right", role: "menu"}, 
-                                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Numeric over time"))
+                                            React.createElement("li", null, React.createElement("a", {value: this.state.countType, onClick: this.handleClick.bind(this, 'countType')}, "Numeric over Time"))
                                         )
                                     )
                                 )
@@ -22526,8 +22580,13 @@ var CountSomething =
                             React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
                                     React.createElement("span", {className: "input-group-addon minw70"}, "Name"), 
-                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""})
+                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": "", value: this.state.countText, onChange: this.handleChange.bind(this, 'countText')})
                                 )
+                            )
+                        ), 
+                        React.createElement("div", {className: "row top7"}, 
+                            React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                React.createElement(Link, {onClick: this.handleCreate.bind(null, this), className: this.state.countText && this.state.countType ? "btn btn-primary minw200" : "btn btn-primary minw200 hide", href: "/my-counts", role: "button"}, "Create Count")
                             )
                         )
                     )
@@ -22537,7 +22596,7 @@ var CountSomething =
 
 module.exports = CountSomething;
 
-},{"react":173}],181:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"../util/api.js":195,"react":173,"react-router-component":6}],181:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22559,18 +22618,12 @@ module.exports = Footer;
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
+var AppActions = require('../../actions/app-actions.js');
 
 var Header =
     React.createClass({displayName: "Header",
-        getInitialState: function () {
-            return {
-                activeNav: 'Home'
-            }
-        },
         handleNav: function (clickedNav) {
-            this.setState({
-                activeNav: clickedNav
-            });
+            AppActions.updatePage(clickedNav);
         },
         render:function() {
             return React.createElement("div", {className: "row"}, 
@@ -22583,20 +22636,20 @@ var Header =
                                 React.createElement("span", {className: "icon-bar"}), 
                                 React.createElement("span", {className: "icon-bar"})
                             ), 
-                            React.createElement("a", {className: (this.state.activeNav == 'Home') ? "navbar-brand active" : "navbar-brand", href: "/", onClick: this.handleNav.bind(null, 'Home')}, "Counted It")
+                            React.createElement("a", {className: (this.props.page == 'Home') ? "navbar-brand active" : "navbar-brand", href: "/", onClick: this.handleNav.bind(null, 'Home')}, "Counted It")
                         ), 
 
                         React.createElement("div", {className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1"}, 
                             React.createElement("ul", {className: "nav navbar-nav"}, 
-                                React.createElement("li", {className: (this.state.activeNav == 'CountSomething') ? "active" : ""}, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), href: "/count"}, "Count Something")), 
-                                React.createElement("li", {className: (this.state.activeNav == 'MyCounts') ? "active" : ""}, React.createElement(Link, {href: "/my-counts", onClick: this.handleNav.bind(null, 'MyCounts')}, "My Counts")), 
-                                React.createElement("li", {className: (this.state.activeNav == 'SharedCounts') ? "active" : ""}, React.createElement(Link, {href: "/shared-counts", onClick: this.handleNav.bind(null, 'SharedCounts')}, "Shared Counts"))
+                                React.createElement("li", {className: (this.props.page == 'CountSomething') ? "active" : ""}, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), href: "/count"}, "Count Something")), 
+                                React.createElement("li", {className: (this.props.page == 'MyCounts') ? "active" : ""}, React.createElement(Link, {href: "/my-counts", onClick: this.handleNav.bind(null, 'MyCounts')}, "My Counts")), 
+                                React.createElement("li", {className: (this.props.page == 'SharedCounts') ? "active" : ""}, React.createElement(Link, {href: "/shared-counts", onClick: this.handleNav.bind(null, 'SharedCounts')}, "Shared Counts"))
                             ), 
                             React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
                                 React.createElement("li", {className: "dropdown"}, 
                                     React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.props.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                                        React.createElement("li", null, React.createElement(Link, {href: "/my-profile"}, "Profile")), 
+                                        React.createElement("li", null, React.createElement(Link, {href: "my-profile"}, "Profile")), 
                                         React.createElement("li", {className: "divider"}), 
                                         React.createElement("li", null, React.createElement("a", {href: "/logout"}, "Logout"))
                                     )
@@ -22611,26 +22664,30 @@ var Header =
 
 module.exports = Header;
 
-},{"react":173,"react-router-component":6}],183:[function(require,module,exports){
+},{"../../actions/app-actions.js":177,"react":173,"react-router-component":6}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
+var AppActions = require('../actions/app-actions.js');
 
 var Home =
     React.createClass({displayName: "Home",
+        handleNav: function (clickedNav) {
+            AppActions.updatePage(clickedNav);
+        },
         render:function() {
             return React.createElement("div", {className: "jumbotron"}, 
                 React.createElement("h1", null, "Welcome to Counted It!"), 
                 React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
                 "in your life."), 
-                React.createElement("p", null, React.createElement(Link, {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
+                React.createElement("p", null, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
     });
 
 module.exports = Home;
 
-},{"react":173,"react-router-component":6}],184:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"react":173,"react-router-component":6}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22691,7 +22748,9 @@ module.exports = SharedCounts;
 },{"react":173}],188:[function(require,module,exports){
 module.exports = {
     UPDATE_PROFILE: 'UPDATE_PROFILE',
-    COUNT_ADDED: 'COUNT_ADDED'
+    COUNT_ADDED: 'COUNT_ADDED',
+    UPDATE_MY_COUNTS: 'UPDATE_MY_COUNTS',
+    UPDATE_PAGE: 'UPDATE_PAGE'
 };
 
 },{}],189:[function(require,module,exports){
@@ -22826,6 +22885,111 @@ module.exports = AppStore;
 
 
 },{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],193:[function(require,module,exports){
+/** @jsx React.DOM */
+var AppDispatcher = require('../dispatchers/app-dispatcher');
+var AppConstants = require('../constants/app-constants');
+var merge = require('react/lib/merge');
+var EventEmitter = require('events').EventEmitter;
+
+var CHANGE_EVENT = "change";
+
+//These are the count objects
+var _myCounts = [];
+
+function _updateMyCounts(myCounts){
+    _myCounts = myCounts;
+}
+
+function _addCount(count){
+    _myCounts.push(count);
+}
+
+var CountStore = merge(EventEmitter.prototype, {
+    emitChange:function(){
+        this.emit(CHANGE_EVENT)
+    },
+
+    addChangeListener:function(callback){
+        this.on(CHANGE_EVENT, callback)
+    },
+
+    removeChangeListener:function(callback){
+        this.removeListener(CHANGE_EVENT, callback)
+    },
+
+    getMyCounts:function(){
+        return _myCounts;
+    },
+
+    dispatcherIndex:AppDispatcher.register(function(payload){
+        var action = payload.action; // this is our action from handleViewAction
+        switch(action.actionType){
+            case AppConstants.COUNT_ADDED:
+                _addCount(payload.action.count);
+                break;
+            case AppConstants.UPDATE_MY_COUNTS:
+                _updateMyCounts(payload.action.counts);
+                break;
+        }
+        CountStore.emitChange();
+
+        return true;
+    })
+});
+
+module.exports = CountStore;
+
+
+},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],194:[function(require,module,exports){
+/** @jsx React.DOM */
+var AppDispatcher = require('../dispatchers/app-dispatcher');
+var AppConstants = require('../constants/app-constants');
+var merge = require('react/lib/merge');
+var EventEmitter = require('events').EventEmitter;
+
+var CHANGE_EVENT = "change";
+
+//These are the count objects
+var _page = 'Home';
+
+function _updatePage(page){
+    _page = page;
+}
+
+var PageStore = merge(EventEmitter.prototype, {
+    emitChange:function(){
+        this.emit(CHANGE_EVENT)
+    },
+
+    addChangeListener:function(callback){
+        this.on(CHANGE_EVENT, callback)
+    },
+
+    removeChangeListener:function(callback){
+        this.removeListener(CHANGE_EVENT, callback)
+    },
+
+    getPage:function(){
+        return _page;
+    },
+
+    dispatcherIndex:AppDispatcher.register(function(payload){
+        var action = payload.action; // this is our action from handleViewAction
+        switch(action.actionType){
+            case AppConstants.UPDATE_PAGE:
+                _updatePage(payload.action.page);
+                break;
+        }
+        PageStore.emitChange();
+
+        return true;
+    })
+});
+
+module.exports = PageStore;
+
+
+},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
 
@@ -22848,6 +23012,7 @@ API.getProfile = function() {
 };
 
 API.createCount = function(countType, countName) {
+
     //request
     //    .post('data/count')
     //    .send({ countType: 'countType', countName: 'countName' })
@@ -22862,6 +23027,19 @@ API.createCount = function(countType, countName) {
 
     //Mocked server response -- TODO make a intelligent switch pattern here
     AppActions.countAdded({countType: countType, countName: countName});
+
+};
+
+API.getMyCounts = function() {
+
+    //request
+    //    .get('/data/my-counts')
+    //    .end(function(res){
+    //        AppActions.updateMyCounts(res.body);
+    //    });
+
+    //Mocked server response -- TODO make a intelligent switch pattern here
+    AppActions.updateMyCounts([{countType: 'test type', countName: 'test count'}]);
 };
 
 module.exports = API;

@@ -8,7 +8,7 @@ var Template =
         render:function(){
             return (
                 <div className="container-fluid">
-                    <Header profile={this.props.profile}/>
+                    <Header profile={this.props.profile} page={this.props.page}/>
                     {this.props.children}
                     <Footer />
                 </div>

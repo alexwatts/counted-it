@@ -9,7 +9,7 @@ var CHANGE_EVENT = "change";
 //These are the count objects
 var _myCounts = [];
 
-function _updateCounts(myCounts){
+function _updateMyCounts(myCounts){
     _myCounts = myCounts;
 }
 
@@ -40,8 +40,11 @@ var CountStore = merge(EventEmitter.prototype, {
             case AppConstants.COUNT_ADDED:
                 _addCount(payload.action.count);
                 break;
+            case AppConstants.UPDATE_MY_COUNTS:
+                _updateMyCounts(payload.action.counts);
+                break;
         }
-        AppStore.emitChange();
+        CountStore.emitChange();
 
         return true;
     })

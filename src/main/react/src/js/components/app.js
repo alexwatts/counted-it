@@ -10,6 +10,10 @@ var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
+var CountStore = require('../stores/count-store.js');
+var PageStore = require('../stores/page-store.js');
+var merge  = require('react/lib/merge');
+
 
 var Locations = Router.Locations;
 var Location = Router.Location;
@@ -17,26 +21,41 @@ var Location = Router.Location;
 function profile(){
     return {profile: AppStore.getProfile()}
 }
+function myCounts(){
+    return {myCounts: CountStore.getMyCounts()}
+}
+function page(){
+    return {page: PageStore.getPage()}
+}
 
 var App =
     React.createClass({
         componentDidMount:function(){
-            //Initialise profile object
+            //Initialise store objects
             API.getProfile();
+            API.getMyCounts();
         },
         componentWillMount:function(){
-            //Listen for updates to the store for profile object
-            AppStore.addChangeListener(this._onChange)
+            //Listen for updates from the stores
+            AppStore.addChangeListener(this._onProfileChange);
+            CountStore.addChangeListener(this._onCountsChange)
+            PageStore.addChangeListener(this._onPageChange)
         },
         getInitialState:function(){
-            return profile();
+            return merge(profile(), myCounts(), page());
         },
-        _onChange:function(){
+        _onProfileChange:function(){
             this.setState(profile())
+        },
+        _onCountsChange:function(){
+            this.setState(myCounts())
+        },
+        _onPageChange:function(){
+            this.setState(page())
         },
         render:function() {
             return (
-                <Template profile={this.state.profile}>
+                <Template profile={this.state.profile} page={this.state.page}>
                     <Locations>
                         <Location path="/" handler={Home}></Location>
                         <Location path="/count" handler={CountSomething}></Location>

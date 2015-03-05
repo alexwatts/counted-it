@@ -13,6 +13,18 @@ var AppActions = {
             actionType: AppConstants.COUNT_ADDED,
             count: count
         })
+    },
+    updateMyCounts:function(counts){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_MY_COUNTS,
+            counts: counts
+        })
+    },
+    updatePage:function(page){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_PAGE,
+            page: page
+        })
     }
 }
 
