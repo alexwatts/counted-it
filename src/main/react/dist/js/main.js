@@ -22413,12 +22413,18 @@ var AppActions = {
             actionType: AppConstants.UPDATE_PROFILE,
             profile: profile
         })
+    },
+    countAdded:function(count){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.COUNT_ADDED,
+            count: count
+        })
     }
 }
 
 module.exports = AppActions;
 
-},{"../constants/app-constants.js":187,"../dispatchers/app-dispatcher.js":188}],178:[function(require,module,exports){
+},{"../constants/app-constants.js":188,"../dispatchers/app-dispatcher.js":189}],178:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
@@ -22447,9 +22453,9 @@ var Home = require('./home.js');
 var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
 var SharedCounts = require('./shared-counts.js');
+var MyProfile = require('./my-profile.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
-var AppActions = require('../actions/app-actions');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
 
@@ -22464,7 +22470,7 @@ var App =
     React.createClass({displayName: "App",
         componentDidMount:function(){
             //Initialise profile object
-            AppActions.updateProfile(API.getProfile());
+            API.getProfile();
         },
         componentWillMount:function(){
             //Listen for updates to the store for profile object
@@ -22483,7 +22489,8 @@ var App =
                         React.createElement(Location, {path: "/", handler: Home}), 
                         React.createElement(Location, {path: "/count", handler: CountSomething}), 
                         React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
-                        React.createElement(Location, {path: "/shared-counts", handler: SharedCounts})
+                        React.createElement(Location, {path: "/shared-counts", handler: SharedCounts}), 
+                        React.createElement(Location, {path: "/my-profile", handler: MyProfile})
                     )
                 )
             )
@@ -22492,16 +22499,41 @@ var App =
 
 module.exports = App;
 
-},{"../actions/app-actions":177,"../stores/app-store.js":191,"../util/api.js":192,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./shared-counts.js":186,"react":173,"react-router-component":6}],180:[function(require,module,exports){
+},{"../stores/app-store.js":192,"../util/api.js":193,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
 var CountSomething =
     React.createClass({displayName: "CountSomething",
         render:function() {
-            return React.createElement("div", {class: "page-header"}, 
-                React.createElement("h1", null, "Count Something ", React.createElement("small", null, "type of thing to count"))
-            )
+
+            return React.createElement("div", null, 
+                        React.createElement("div", {className: "row"}, 
+                            React.createElement("div", {className: "col-xs-6"}, 
+                                React.createElement("div", {className: "input-group"}, 
+                                    React.createElement("span", {className: "input-group-addon minw70"}, "Type"), 
+                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""}), 
+                                    React.createElement("div", {className: "input-group-btn"}, 
+                                        React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false"}, " ", React.createElement("span", {className: "caret"})), 
+                                        React.createElement("ul", {className: "dropdown-menu dropdown-menu-right", role: "menu"}, 
+                                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Numeric over time"))
+                                        )
+                                    )
+
+                                )
+                            )
+                        ), 
+                        React.createElement("div", {className: "row top7"}, 
+
+                            React.createElement("div", {className: "col-xs-6"}, 
+                                React.createElement("div", {className: "input-group"}, 
+                                    React.createElement("span", {className: "input-group-addon minw70"}, "Name"), 
+                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""})
+                                )
+                            )
+                        )
+                    )
+
         }
     });
 
@@ -22566,7 +22598,7 @@ var Header =
                                 React.createElement("li", {className: "dropdown"}, 
                                     React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.props.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                                        React.createElement("li", null, React.createElement("a", {href: "#"}, "Profile")), 
+                                        React.createElement("li", null, React.createElement(Link, {href: "/my-profile"}, "Profile")), 
                                         React.createElement("li", {className: "divider"}), 
                                         React.createElement("li", null, React.createElement("a", {href: "/logout"}, "Logout"))
                                     )
@@ -22584,6 +22616,7 @@ module.exports = Header;
 },{"react":173,"react-router-component":6}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+var Link = require('react-router-component').Link;
 
 var Home =
     React.createClass({displayName: "Home",
@@ -22592,14 +22625,14 @@ var Home =
                 React.createElement("h1", null, "Welcome to Counted It!"), 
                 React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
                 "in your life."), 
-                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
+                React.createElement("p", null, React.createElement(Link, {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
     });
 
 module.exports = Home;
 
-},{"react":173}],184:[function(require,module,exports){
+},{"react":173,"react-router-component":6}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22631,6 +22664,21 @@ module.exports = MyCounts;
 /** @jsx React.DOM */
 var React = require('react');
 
+var MyProfile =
+    React.createClass({displayName: "MyProfile",
+        render:function() {
+            return React.createElement("div", {class: "page-header"}, 
+                React.createElement("h1", null, "My Profile ", React.createElement("small", null, "details of your account"))
+            )
+        }
+    });
+
+module.exports = MyProfile;
+
+},{"react":173}],187:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
 var SharedCounts =
     React.createClass({displayName: "SharedCounts",
         render:function() {
@@ -22642,12 +22690,13 @@ var SharedCounts =
 
 module.exports = SharedCounts;
 
-},{"react":173}],187:[function(require,module,exports){
+},{"react":173}],188:[function(require,module,exports){
 module.exports = {
-    UPDATE_PROFILE: 'UPDATE_PROFILE'
+    UPDATE_PROFILE: 'UPDATE_PROFILE',
+    COUNT_ADDED: 'COUNT_ADDED'
 };
 
-},{}],188:[function(require,module,exports){
+},{}],189:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js');
 var merge  = require('react/lib/merge');
 
@@ -22662,7 +22711,7 @@ var AppDispatcher = merge(Dispatcher.prototype, {
 
 module.exports = AppDispatcher;
 
-},{"./dispatcher.js":189,"react/lib/merge":162}],189:[function(require,module,exports){
+},{"./dispatcher.js":190,"react/lib/merge":162}],190:[function(require,module,exports){
 var Promise = require('es6-promise').Promise;
 var merge = require('react/lib/merge');
 
@@ -22719,7 +22768,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
 
 module.exports = Dispatcher;
 
-},{"es6-promise":1,"react/lib/merge":162}],190:[function(require,module,exports){
+},{"es6-promise":1,"react/lib/merge":162}],191:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -22729,7 +22778,7 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":179,"react":173}],191:[function(require,module,exports){
+},{"./components/app":179,"react":173}],192:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -22738,6 +22787,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = "change";
 
+//This is the profile object
 var _profile = {'stat':'','profile':{'providerName':'','identifier':'','displayName':'','name':{'formatted':'','givenName':'','familyName':''},'url':'','photo':'','gender':'','googleUserId':'','providerSpecifier':''}};
 
 function _updateProfile(profile){
@@ -22777,8 +22827,9 @@ var AppStore = merge(EventEmitter.prototype, {
 module.exports = AppStore;
 
 
-},{"../constants/app-constants":187,"../dispatchers/app-dispatcher":188,"events":2,"react/lib/merge":162}],192:[function(require,module,exports){
+},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],193:[function(require,module,exports){
 var request = require('superagent');
+var AppActions = require('../actions/app-actions');
 
 var API = {
     //Main namespace for API object
@@ -22786,17 +22837,35 @@ var API = {
 
 API.getProfile = function() {
 
-    //Server API Request
+    var profileObject = {};
+
     //request
     //    .get('/profile')
     //    .end(function(res){
-    //        return res;
+    //        AppActions.updateProfile(res.body);
     //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
     return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
 
+API.createCount = function(countType, countName) {
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.countAdded(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    //Mocked server response -- TODO make a intelligent switch pattern here
+    AppActions.countAdded({countType: countType, countName: countName});
+};
+
 module.exports = API;
 
-},{"superagent":174}]},{},[190])
+},{"../actions/app-actions":177,"superagent":174}]},{},[191])

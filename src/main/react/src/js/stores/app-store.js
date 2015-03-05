@@ -6,6 +6,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = "change";
 
+//This is the profile object
 var _profile = {'stat':'','profile':{'providerName':'','identifier':'','displayName':'','name':{'formatted':'','givenName':'','familyName':''},'url':'','photo':'','gender':'','googleUserId':'','providerSpecifier':''}};
 
 function _updateProfile(profile){

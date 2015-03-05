@@ -22413,6 +22413,12 @@ var AppActions = {
             actionType: AppConstants.UPDATE_PROFILE,
             profile: profile
         })
+    },
+    countAdded:function(count){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.COUNT_ADDED,
+            count: count
+        })
     }
 }
 
@@ -22500,9 +22506,34 @@ var React = require('react');
 var CountSomething =
     React.createClass({displayName: "CountSomething",
         render:function() {
-            return React.createElement("div", {class: "page-header"}, 
-                React.createElement("h1", null, "Count Something ", React.createElement("small", null, "type of thing to count"))
-            )
+
+            return React.createElement("div", null, 
+                        React.createElement("div", {className: "row"}, 
+                            React.createElement("div", {className: "col-xs-6"}, 
+                                React.createElement("div", {className: "input-group"}, 
+                                    React.createElement("span", {className: "input-group-addon minw70"}, "Type"), 
+                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""}), 
+                                    React.createElement("div", {className: "input-group-btn"}, 
+                                        React.createElement("button", {type: "button", className: "btn btn-default dropdown-toggle", "data-toggle": "dropdown", "aria-expanded": "false"}, " ", React.createElement("span", {className: "caret"})), 
+                                        React.createElement("ul", {className: "dropdown-menu dropdown-menu-right", role: "menu"}, 
+                                            React.createElement("li", null, React.createElement("a", {href: "#"}, "Numeric over time"))
+                                        )
+                                    )
+
+                                )
+                            )
+                        ), 
+                        React.createElement("div", {className: "row top7"}, 
+
+                            React.createElement("div", {className: "col-xs-6"}, 
+                                React.createElement("div", {className: "input-group"}, 
+                                    React.createElement("span", {className: "input-group-addon minw70"}, "Name"), 
+                                    React.createElement("input", {type: "text", className: "form-control", "aria-label": ""})
+                                )
+                            )
+                        )
+                    )
+
         }
     });
 
@@ -22661,7 +22692,8 @@ module.exports = SharedCounts;
 
 },{"react":173}],188:[function(require,module,exports){
 module.exports = {
-    UPDATE_PROFILE: 'UPDATE_PROFILE'
+    UPDATE_PROFILE: 'UPDATE_PROFILE',
+    COUNT_ADDED: 'COUNT_ADDED'
 };
 
 },{}],189:[function(require,module,exports){
@@ -22755,6 +22787,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var CHANGE_EVENT = "change";
 
+//This is the profile object
 var _profile = {'stat':'','profile':{'providerName':'','identifier':'','displayName':'','name':{'formatted':'','givenName':'','familyName':''},'url':'','photo':'','gender':'','googleUserId':'','providerSpecifier':''}};
 
 function _updateProfile(profile){
@@ -22806,15 +22839,31 @@ API.getProfile = function() {
 
     var profileObject = {};
 
-    //Server API Request
-    request
-        .get('/profile')
-        .end(function(res){
-            AppActions.updateProfile(res.body);
-        });
+    //request
+    //    .get('/profile')
+    //    .end(function(res){
+    //        AppActions.updateProfile(res.body);
+    //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    //return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
+    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
+};
+
+API.createCount = function(countType, countName) {
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.countAdded(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    //Mocked server response -- TODO make a intelligent switch pattern here
+    AppActions.countAdded({countType: countType, countName: countName});
 };
 
 module.exports = API;

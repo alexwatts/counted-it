@@ -7,6 +7,12 @@ var AppActions = {
             actionType: AppConstants.UPDATE_PROFILE,
             profile: profile
         })
+    },
+    countAdded:function(count){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.COUNT_ADDED,
+            count: count
+        })
     }
 }
 
