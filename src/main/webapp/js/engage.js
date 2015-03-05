@@ -160,7 +160,7 @@
         } else if (janrain.settings.enforceSecureCloudfront) {
             var rootPath = "https://ssl-widget-cdn.rpxnow.com/";
         } else {
-            var rootPath = document.location.protocol === 'https:' ? "https://d29usylhdk1xyu.cloudfront.net/" : "http://localhost:8089/js/";
+            var rootPath = document.location.protocol === 'https:' ? "https://d29usylhdk1xyu.cloudfront.net/" : "http://counted.it/js/";
         }
         return rootPath;
     }
