@@ -22418,7 +22418,7 @@ var AppActions = {
 
 module.exports = AppActions;
 
-},{"../constants/app-constants.js":184,"../dispatchers/app-dispatcher.js":185}],178:[function(require,module,exports){
+},{"../constants/app-constants.js":187,"../dispatchers/app-dispatcher.js":188}],178:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
@@ -22429,7 +22429,7 @@ var Template =
         render:function(){
             return (
                 React.createElement("div", {className: "container"}, 
-                    React.createElement(Header, null), 
+                    React.createElement(Header, {profile: this.props.profile}), 
                     this.props.children, 
                     React.createElement(Footer, null)
                 )
@@ -22439,30 +22439,51 @@ var Template =
 
 module.exports = Template;
 
-},{"./footer/footer.js":180,"./header/header.js":181,"react":173}],179:[function(require,module,exports){
+},{"./footer/footer.js":181,"./header/header.js":182,"react":173}],179:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Login = require('./login.js');
 var Home = require('./home.js');
+var CountSomething = require('./count-something.js');
+var MyCounts = require('./my-counts.js');
+var SharedCounts = require('./shared-counts.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var AppActions = require('../actions/app-actions');
 var API = require('../util/api.js');
+var AppStore = require('../stores/app-store.js');
 
 var Locations = Router.Locations;
 var Location = Router.Location;
 
+function profile(){
+    return {profile: AppStore.getProfile()}
+}
+
 var App =
     React.createClass({displayName: "App",
         componentDidMount:function(){
+            //Initialise profile object
             AppActions.updateProfile(API.getProfile());
+        },
+        componentWillMount:function(){
+            //Listen for updates to the store for profile object
+            AppStore.addChangeListener(this._onChange)
+        },
+        getInitialState:function(){
+            return profile();
+        },
+        _onChange:function(){
+            this.setState(profile())
         },
         render:function() {
             return (
-                React.createElement(Template, null, 
+                React.createElement(Template, {profile: this.state.profile}, 
                     React.createElement(Locations, null, 
                         React.createElement(Location, {path: "/", handler: Home}), 
-                        React.createElement(Location, {path: "/login", handler: Login})
+                        React.createElement(Location, {path: "/count", handler: CountSomething}), 
+                        React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
+                        React.createElement(Location, {path: "/shared-counts", handler: SharedCounts})
                     )
                 )
             )
@@ -22471,7 +22492,22 @@ var App =
 
 module.exports = App;
 
-},{"../actions/app-actions":177,"../util/api.js":189,"./app-template.js":178,"./home.js":182,"./login.js":183,"react":173,"react-router-component":6}],180:[function(require,module,exports){
+},{"../actions/app-actions":177,"../stores/app-store.js":191,"../util/api.js":192,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./shared-counts.js":186,"react":173,"react-router-component":6}],180:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var CountSomething =
+    React.createClass({displayName: "CountSomething",
+        render:function() {
+            return React.createElement("div", {class: "page-header"}, 
+                React.createElement("h1", null, "Count Something ", React.createElement("small", null, "type of thing to count"))
+            )
+        }
+    });
+
+module.exports = CountSomething;
+
+},{"react":173}],181:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22489,25 +22525,22 @@ var Footer =
 
 module.exports = Footer;
 
-},{"react":173}],181:[function(require,module,exports){
+},{"react":173}],182:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-var AppStore = require('../../stores/app-store.js');
-
-function profile(){
-    return {profile: AppStore.getProfile()}
-}
+var Link = require('react-router-component').Link;
 
 var Header =
     React.createClass({displayName: "Header",
-        getInitialState:function(){
-            return profile();
+        getInitialState: function () {
+            return {
+                activeNav: 'Home'
+            }
         },
-        componentWillMount:function(){
-            AppStore.addChangeListener(this._onChange)
-        },
-        _onChange:function(){
-            this.setState(profile())
+        handleNav: function (clickedNav) {
+            this.setState({
+                activeNav: clickedNav
+            });
         },
         render:function() {
             return React.createElement("div", {className: "row"}, 
@@ -22520,17 +22553,18 @@ var Header =
                                 React.createElement("span", {className: "icon-bar"}), 
                                 React.createElement("span", {className: "icon-bar"})
                             ), 
-                            React.createElement("a", {className: "navbar-brand", href: "#"}, "Counted It")
+                            React.createElement("a", {className: (this.state.activeNav == 'Home') ? "navbar-brand active" : "navbar-brand", href: "/", onClick: this.handleNav.bind(null, 'Home')}, "Counted It")
                         ), 
 
                         React.createElement("div", {className: "collapse navbar-collapse", id: "bs-example-navbar-collapse-1"}, 
                             React.createElement("ul", {className: "nav navbar-nav"}, 
-                                React.createElement("li", {className: "active"}, React.createElement("a", {href: "#"}, "Count Something ", React.createElement("span", {className: "sr-only"}, "(current)"))), 
-                                React.createElement("li", null, React.createElement("a", {href: "#"}, "Shared Counts"))
+                                React.createElement("li", {className: (this.state.activeNav == 'CountSomething') ? "active" : ""}, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), href: "/count"}, "Count Something")), 
+                                React.createElement("li", {className: (this.state.activeNav == 'MyCounts') ? "active" : ""}, React.createElement(Link, {href: "/my-counts", onClick: this.handleNav.bind(null, 'MyCounts')}, "My Counts")), 
+                                React.createElement("li", {className: (this.state.activeNav == 'SharedCounts') ? "active" : ""}, React.createElement(Link, {href: "/shared-counts", onClick: this.handleNav.bind(null, 'SharedCounts')}, "Shared Counts"))
                             ), 
                             React.createElement("ul", {className: "nav navbar-nav navbar-right"}, 
                                 React.createElement("li", {className: "dropdown"}, 
-                                    React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.state.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
+                                    React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.props.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
                                         React.createElement("li", null, React.createElement("a", {href: "#"}, "Profile")), 
                                         React.createElement("li", {className: "divider"}), 
@@ -22547,7 +22581,7 @@ var Header =
 
 module.exports = Header;
 
-},{"../../stores/app-store.js":188,"react":173}],182:[function(require,module,exports){
+},{"react":173,"react-router-component":6}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22557,16 +22591,15 @@ var Home =
             return React.createElement("div", {className: "jumbotron"}, 
                 React.createElement("h1", null, "Welcome to Counted It!"), 
                 React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
-                "in your life. You can use it to count things you are doing yourself, or you can count" + ' ' +
-                "things with other people"), 
-                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "#", role: "button"}, "Start Counting"))
+                "in your life."), 
+                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
     });
 
 module.exports = Home;
 
-},{"react":173}],183:[function(require,module,exports){
+},{"react":173}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22579,12 +22612,42 @@ var Login =
 
 module.exports = Login;
 
-},{"react":173}],184:[function(require,module,exports){
+},{"react":173}],185:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var MyCounts =
+    React.createClass({displayName: "MyCounts",
+        render:function() {
+            return React.createElement("div", {class: "page-header"}, 
+                React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting"))
+            )
+        }
+    });
+
+module.exports = MyCounts;
+
+},{"react":173}],186:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+
+var SharedCounts =
+    React.createClass({displayName: "SharedCounts",
+        render:function() {
+            return React.createElement("div", {class: "page-header"}, 
+                React.createElement("h1", null, "Shared Counts ", React.createElement("small", null, "coming soon"))
+            )
+        }
+    });
+
+module.exports = SharedCounts;
+
+},{"react":173}],187:[function(require,module,exports){
 module.exports = {
     UPDATE_PROFILE: 'UPDATE_PROFILE'
 };
 
-},{}],185:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js');
 var merge  = require('react/lib/merge');
 
@@ -22599,7 +22662,7 @@ var AppDispatcher = merge(Dispatcher.prototype, {
 
 module.exports = AppDispatcher;
 
-},{"./dispatcher.js":186,"react/lib/merge":162}],186:[function(require,module,exports){
+},{"./dispatcher.js":189,"react/lib/merge":162}],189:[function(require,module,exports){
 var Promise = require('es6-promise').Promise;
 var merge = require('react/lib/merge');
 
@@ -22656,7 +22719,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
 
 module.exports = Dispatcher;
 
-},{"es6-promise":1,"react/lib/merge":162}],187:[function(require,module,exports){
+},{"es6-promise":1,"react/lib/merge":162}],190:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -22666,7 +22729,7 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":179,"react":173}],188:[function(require,module,exports){
+},{"./components/app":179,"react":173}],191:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -22714,7 +22777,7 @@ var AppStore = merge(EventEmitter.prototype, {
 module.exports = AppStore;
 
 
-},{"../constants/app-constants":184,"../dispatchers/app-dispatcher":185,"events":2,"react/lib/merge":162}],189:[function(require,module,exports){
+},{"../constants/app-constants":187,"../dispatchers/app-dispatcher":188,"events":2,"react/lib/merge":162}],192:[function(require,module,exports){
 var request = require('superagent');
 
 var API = {
@@ -22736,4 +22799,4 @@ API.getProfile = function() {
 
 module.exports = API;
 
-},{"superagent":174}]},{},[187])
+},{"superagent":174}]},{},[190])

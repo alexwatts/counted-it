@@ -8,7 +8,7 @@ var Home =
                 <h1>Welcome to Counted It!</h1>
                 <p>Counted It is a new unique place where you can count the things that are happening
                 in your life.</p>
-                <p><a className="btn btn-primary btn-lg" href="#" role="button">Start Counting</a></p>
+                <p><a className="btn btn-primary btn-lg" href="/count" role="button">Start Counting</a></p>
             </div>
         }
     });
