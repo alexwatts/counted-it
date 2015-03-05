@@ -22584,6 +22584,7 @@ module.exports = Header;
 },{"react":173,"react-router-component":6}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+var Link = require('react-router-component').Link;
 
 var Home =
     React.createClass({displayName: "Home",
@@ -22592,14 +22593,14 @@ var Home =
                 React.createElement("h1", null, "Welcome to Counted It!"), 
                 React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
                 "in your life."), 
-                React.createElement("p", null, React.createElement("a", {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
+                React.createElement("p", null, React.createElement(Link, {className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
     });
 
 module.exports = Home;
 
-},{"react":173}],184:[function(require,module,exports){
+},{"react":173,"react-router-component":6}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
