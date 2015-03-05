@@ -7,7 +7,7 @@ var Template =
     React.createClass({
         render:function(){
             return (
-                <div className="container">
+                <div className="container-fluid">
                     <Header profile={this.props.profile}/>
                     {this.props.children}
                     <Footer />

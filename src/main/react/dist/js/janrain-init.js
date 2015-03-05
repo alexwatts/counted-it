@@ -19,13 +19,17 @@
     e.id = 'janrainAuthWidget';
 
     if (document.location.protocol === 'https:') {
-        e.src = 'https://rpxnow.com/js/lib/whatswhats/engage.js';
+        e.src = '/js/engage.js';
     } else {
-        e.src = 'http://widget-cdn.rpxnow.com/js/lib/whatswhats/engage.js';
+        e.src = '/js/engage.js';
     }
 
+
+    janrain.settings.width = "200";
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(e, s);
+
+
 
 })();
 

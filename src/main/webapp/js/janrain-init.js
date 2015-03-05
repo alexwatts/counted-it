@@ -2,8 +2,8 @@
     if (typeof window.janrain !== 'object') window.janrain = {};
     if (typeof window.janrain.settings !== 'object') window.janrain.settings = {};
 
-    //janrain.settings.tokenUrl = 'http://counted.it/janrain/token';
-    janrain.settings.tokenUrl = 'http://localhost:8080/janrain/token';
+    janrain.settings.tokenUrl = 'http://counted.it/janrain/token';
+    //janrain.settings.tokenUrl = 'http://localhost:8080/janrain/token';
 
     function isReady() {
         janrain.ready = true;
@@ -20,13 +20,17 @@
     e.id = 'janrainAuthWidget';
 
     if (document.location.protocol === 'https:') {
-        e.src = 'https://rpxnow.com/js/lib/whatswhats/engage.js';
+        e.src = '/js/engage.js';
     } else {
-        e.src = 'http://widget-cdn.rpxnow.com/js/lib/whatswhats/engage.js';
+        e.src = '/js/engage.js';
     }
 
+
+    janrain.settings.width = "200";
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(e, s);
+
+
 
 })();
 

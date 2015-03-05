@@ -1,4 +1,4 @@
-.footer{ height: 120px}
+.footer{ height: 80px}
 
 .top5 { margin-top:5px; }
 .top7 { margin-top:7px; }
@@ -10,3 +10,13 @@
 .minw70 { min-width:70px; }
 .minw100 { min-width:100px; }
 .minw200 { min-width:200px; }
+
+.minh100 { min-height:100px; }
+.minh200 { min-height:200px; }
+.minh300 { min-height:300px; }s
+.minh400 { min-height:400px; }
+.minh500 { min-height:500px; }
+.minh600 { min-height:600px; }
+.minh700 { min-height:700px; }
+
+.janrainContent {height:95%; width:95%}

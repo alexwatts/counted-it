@@ -7,7 +7,7 @@ var CountSomething =
 
             return <div>
                         <div className="row">
-                            <div className="col-xs-6">
+                            <div className="col-md-12 col-xs-12">
                                 <div className="input-group">
                                     <span className="input-group-addon minw70">Type</span>
                                     <input type="text" className="form-control" aria-label=""/>
@@ -17,13 +17,11 @@ var CountSomething =
                                             <li><a href="#">Numeric over time</a></li>
                                         </ul>
                                     </div>
-
                                 </div>
                             </div>
                         </div>
                         <div className="row top7">
-
-                            <div className="col-xs-6">
+                            <div className="col-md-12 col-xs-12">
                                 <div className="input-group">
                                     <span className="input-group-addon minw70">Name</span>
                                     <input type="text" className="form-control" aria-label=""/>

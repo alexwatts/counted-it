@@ -22434,7 +22434,7 @@ var Template =
     React.createClass({displayName: "Template",
         render:function(){
             return (
-                React.createElement("div", {className: "container"}, 
+                React.createElement("div", {className: "container-fluid"}, 
                     React.createElement(Header, {profile: this.props.profile}), 
                     this.props.children, 
                     React.createElement(Footer, null)
@@ -22509,7 +22509,7 @@ var CountSomething =
 
             return React.createElement("div", null, 
                         React.createElement("div", {className: "row"}, 
-                            React.createElement("div", {className: "col-xs-6"}, 
+                            React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
                                     React.createElement("span", {className: "input-group-addon minw70"}, "Type"), 
                                     React.createElement("input", {type: "text", className: "form-control", "aria-label": ""}), 
@@ -22519,13 +22519,11 @@ var CountSomething =
                                             React.createElement("li", null, React.createElement("a", {href: "#"}, "Numeric over time"))
                                         )
                                     )
-
                                 )
                             )
                         ), 
                         React.createElement("div", {className: "row top7"}, 
-
-                            React.createElement("div", {className: "col-xs-6"}, 
+                            React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
                                     React.createElement("span", {className: "input-group-addon minw70"}, "Name"), 
                                     React.createElement("input", {type: "text", className: "form-control", "aria-label": ""})

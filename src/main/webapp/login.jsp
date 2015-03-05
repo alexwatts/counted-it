@@ -14,6 +14,8 @@
     <script src="js/janrain-init.js"></script>
 </head>
 <body>
-<div class="container" id="janrainEngageEmbed"></div>
+<div class="container">
+    <div id="janrainEngageEmbed"></div>
+</div>
 </body>
 </html>
