@@ -22470,19 +22470,14 @@ var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
-var CountStore = require('../stores/count-store.js');
 var PageStore = require('../stores/page-store.js');
 var merge  = require('react/lib/merge');
-
 
 var Locations = Router.Locations;
 var Location = Router.Location;
 
 function profile(){
     return {profile: AppStore.getProfile()}
-}
-function myCounts(){
-    return {myCounts: CountStore.getMyCounts()}
 }
 function page(){
     return {page: PageStore.getPage()}
@@ -22493,22 +22488,17 @@ var App =
         componentDidMount:function(){
             //Initialise store objects
             API.getProfile();
-            API.getMyCounts();
         },
         componentWillMount:function(){
             //Listen for updates from the stores
-            AppStore.addChangeListener(this._onProfileChange);
-            CountStore.addChangeListener(this._onCountsChange)
+            AppStore.addChangeListener(this._onProfileChange)
             PageStore.addChangeListener(this._onPageChange)
         },
         getInitialState:function(){
-            return merge(profile(), myCounts(), page());
+            return merge(profile(), page());
         },
         _onProfileChange:function(){
             this.setState(profile())
-        },
-        _onCountsChange:function(){
-            this.setState(myCounts())
         },
         _onPageChange:function(){
             this.setState(page())
@@ -22530,7 +22520,7 @@ var App =
 
 module.exports = App;
 
-},{"../stores/app-store.js":192,"../stores/count-store.js":193,"../stores/page-store.js":194,"../util/api.js":195,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
+},{"../stores/app-store.js":192,"../stores/page-store.js":194,"../util/api.js":195,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22703,19 +22693,58 @@ module.exports = Login;
 },{"react":173}],185:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
+var API = require('../util/api.js');
+var CountStore = require('../stores/count-store.js');
+
+function myCounts(){
+    return {myCounts: CountStore.getMyCounts()}
+}
 
 var MyCounts =
     React.createClass({displayName: "MyCounts",
+        getInitialState:function(){
+            return myCounts();
+        },
+        componentDidMount:function(){
+            //Initialise store objects
+            API.getMyCounts();
+        },
+        componentWillMount:function(){
+            //Listen for updates from the stores
+            CountStore.addChangeListener(this._onCountsChange)
+        },
+        _onCountsChange:function(){
+            this.setState(myCounts())
+        },
         render:function() {
-            return React.createElement("div", {class: "page-header"}, 
-                React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting"))
+
+            var counts = this.state.myCounts.map(function(item, i){
+                return (
+                    React.createElement("div", {className: "col-md-3 col-xs-3"}, 
+                        React.createElement("div", {className: "well"}, 
+                            React.createElement("div", {className: "row"}, 
+                                React.createElement("a", {href: "count/:count"}, React.createElement("img", {className: "count-summary", src: "numeric-over-time.png"}))
+                            ), 
+                            React.createElement("div", {className: "row"}, 
+                                React.createElement("span", {className: "label label-default"}, item.countName)
+                            )
+                        )
+                    )
+                )
+            })
+
+            return React.createElement("div", {className: "page-header"}, 
+                React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting")), 
+                React.createElement("div", {className: "row"}, 
+                    counts
+                )
             )
         }
     });
 
 module.exports = MyCounts;
 
-},{"react":173}],186:[function(require,module,exports){
+},{"../stores/count-store.js":193,"../util/api.js":195,"react":173}],186:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22992,6 +23021,7 @@ module.exports = PageStore;
 },{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
+var CountStore = require('../stores/count-store.js');
 
 var API = {
     //Main namespace for API object
@@ -23001,14 +23031,14 @@ API.getProfile = function() {
 
     var profileObject = {};
 
-    request
-        .get('/profile')
-        .end(function(res){
-            AppActions.updateProfile(res.body);
-        });
+    //request
+    //    .get('/profile')
+    //    .end(function(res){
+    //        AppActions.updateProfile(res.body);
+    //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    //return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
+    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
 
 API.createCount = function(countType, countName) {
@@ -23032,6 +23062,11 @@ API.createCount = function(countType, countName) {
 
 API.getMyCounts = function() {
 
+    //Only fetch counts if we dont' already have em. Need to design this out for obvious reasons
+    if (CountStore.getMyCounts() && CountStore.getMyCounts().length > 0) {
+        return;
+    }
+
     //request
     //    .get('/data/my-counts')
     //    .end(function(res){
@@ -23044,4 +23079,4 @@ API.getMyCounts = function() {
 
 module.exports = API;
 
-},{"../actions/app-actions":177,"superagent":174}]},{},[191])
+},{"../actions/app-actions":177,"../stores/count-store.js":193,"superagent":174}]},{},[191])
