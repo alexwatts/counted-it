@@ -22426,17 +22426,35 @@ var AppActions = {
             counts: counts
         })
     },
+    updateCountDetails:function(details){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_COUNT_DETAILS,
+            details: details
+        })
+    },
     updatePage:function(page){
         AppDispatcher.handleViewAction({
             actionType: AppConstants.UPDATE_PAGE,
             page: page
+        })
+    },
+    addCountToDetails:function(details){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.ADD_COUNT_TO_DETAILS,
+            details: details
+        })
+    },
+    deleteCountValueForDetail:function(countIdAndItem){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS,
+            countIdAndItem: countIdAndItem
         })
     }
 }
 
 module.exports = AppActions;
 
-},{"../constants/app-constants.js":188,"../dispatchers/app-dispatcher.js":189}],178:[function(require,module,exports){
+},{"../constants/app-constants.js":189,"../dispatchers/app-dispatcher.js":190}],178:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
@@ -22457,7 +22475,7 @@ var Template =
 
 module.exports = Template;
 
-},{"./footer/footer.js":181,"./header/header.js":182,"react":173}],179:[function(require,module,exports){
+},{"./footer/footer.js":182,"./header/header.js":183,"react":173}],179:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Login = require('./login.js');
@@ -22465,13 +22483,15 @@ var Home = require('./home.js');
 var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
 var SharedCounts = require('./shared-counts.js');
+var Count = require('./count.js');
 var MyProfile = require('./my-profile.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
 var PageStore = require('../stores/page-store.js');
-var merge  = require('react/lib/merge');
+var merge = require('react/lib/merge');
+var AppActions = require('../actions/app-actions.js');
 
 var Locations = Router.Locations;
 var Location = Router.Location;
@@ -22487,7 +22507,7 @@ var App =
     React.createClass({displayName: "App",
         componentDidMount:function(){
             //Initialise store objects
-            API.getProfile();
+            AppActions.updateProfile(API.getProfile());
         },
         componentWillMount:function(){
             //Listen for updates from the stores
@@ -22511,6 +22531,7 @@ var App =
                         React.createElement(Location, {path: "/count", handler: CountSomething}), 
                         React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
                         React.createElement(Location, {path: "/shared-counts", handler: SharedCounts}), 
+                        React.createElement(Location, {path: "/count/:countId", handler: Count}), 
                         React.createElement(Location, {path: "/my-profile", handler: MyProfile})
                     )
                 )
@@ -22520,7 +22541,7 @@ var App =
 
 module.exports = App;
 
-},{"../stores/app-store.js":192,"../stores/page-store.js":194,"../util/api.js":195,"./app-template.js":178,"./count-something.js":180,"./home.js":183,"./login.js":184,"./my-counts.js":185,"./my-profile.js":186,"./shared-counts.js":187,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"../stores/app-store.js":193,"../stores/page-store.js":196,"../util/api.js":197,"./app-template.js":178,"./count-something.js":180,"./count.js":181,"./home.js":184,"./login.js":185,"./my-counts.js":186,"./my-profile.js":187,"./shared-counts.js":188,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22586,7 +22607,143 @@ var CountSomething =
 
 module.exports = CountSomething;
 
-},{"../actions/app-actions.js":177,"../util/api.js":195,"react":173,"react-router-component":6}],181:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"../util/api.js":197,"react":173,"react-router-component":6}],181:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+var Link = require('react-router-component').Link;
+var API = require('../util/api.js');
+var CountStore = require('../stores/count-store.js');
+var DetailsStore = require('../stores/details-store.js');
+var merge  = require('react/lib/merge');
+
+function countDetails(countId){
+    return {countDetails: DetailsStore.getCountDetail(countId)};
+}
+
+function count(countId){
+    return {count: CountStore.getCount(countId)};
+}
+
+function date(date) {
+    return date;
+}
+
+var Count =
+    React.createClass({displayName: "Count",
+        componentDidMount:function() {
+            //Initialise store objects
+            API.getCountDetails(this.props.countId);
+        },
+        componentWillMount:function() {
+            //Listen for updates from the stores
+            DetailsStore.addChangeListener(this._onDetailsChange);
+        },
+        _onDetailsChange:function() {
+            console.log('details change!');
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+        },
+        getInitialState:function() {
+            var countObj = count(this.props.countId);
+            var countDetailsObj = countDetails(this.props.countId);
+
+            var formObj = {
+                countValue: '',
+                date: date(this.getTodaysDate())
+            };
+
+            var initialStateObj = merge(merge(countObj, countDetailsObj), formObj);
+
+            console.log(initialStateObj);
+
+            return initialStateObj;
+        },
+        getTodaysDate: function() {
+            var date = new Date();
+            var todaysDate = date.toISOString().substring(0, 10);
+            return todaysDate;
+        },
+        handleValueChange: function(name, e) {
+            var change = {};
+            change[name] = e.target.value;
+            this.setState(change);
+        },
+        handleCreate: function (name, e) {
+            e.preventDefault();
+            API.createCountValueForDetail(this.props.countId, this.state.date, this.state.countValue);
+        },
+        handleDelete: function (item, e) {
+            console.log(item);
+            API.deleteCountValueForDetail(this.props.countId, item);
+        },
+        render:function() {
+            var that = this;
+            if (this.state.countDetails) {
+                var counts = this.state.countDetails.counts.map(function(item, i){
+                    return (
+                        React.createElement("li", {className: "list-group-item"}, 
+                            React.createElement("div", {className: "row"}, 
+                                React.createElement("div", {className: "col-md-2 col-xs-2"}, "value: ", item.value), 
+                                React.createElement("div", {className: "col-md-3 col-xs-3"}, "date: ", item.date), 
+                                React.createElement("div", {className: "col-md-3 col-xs-3"}, React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(this, item)}, "Delete"))
+                            )
+                        )
+                    )
+                });
+            }
+
+            return  React.createElement("div", null, 
+                        React.createElement("ol", {className: "breadcrumb"}, 
+                            React.createElement("li", null, React.createElement("a", {href: "#"}, "My Counts")), 
+                            React.createElement("li", {className: "active"}, this.state.count.countName)
+                        ), 
+                        React.createElement("div", {className: "panel panel-default"}, 
+                            React.createElement("div", {className: "panel-heading"}, 
+                                React.createElement("div", {className: "row"}, 
+                                    React.createElement("img", {className: "img-container-small", src: "../numeric-over-time.png"})
+                                ), 
+                                React.createElement("div", {className: "row"}, 
+                                    React.createElement("span", {className: "label label-default"}, this.state.count.countName)
+                                )
+                            ), 
+                            React.createElement("div", {className: "panel-body"}, 
+                                React.createElement("p", null, 
+                                    React.createElement("div", {className: "row"}, 
+                                        React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                                React.createElement("div", {className: "input-group"}, 
+                                                    React.createElement("button", {type: "button", className: "btn btn-default", "aria-expanded": "false"}, "today"), 
+                                                    React.createElement("input", {type: "date", value: this.state.date, onChange: this.handleValueChange.bind(this, 'date')})
+                                                )
+                                        )
+                                    ), 
+                                    React.createElement("div", {className: "row top7"}, 
+                                        React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                            React.createElement("div", {className: "input-group"}, 
+                                                React.createElement("span", {className: "input-group-addon minw70"}, "Value"), 
+                                                React.createElement("input", {type: "number", className: "form-control", "aria-label": "", value: this.state.countValue, onChange: this.handleValueChange.bind(this, 'countValue')})
+                                            )
+                                        )
+                                    ), 
+                                    React.createElement("div", {className: "row top7"}, 
+                                        React.createElement("div", {className: this.state.countValue ? "alert alert-warning hide" : "alert alert-warning", role: "alert"}, "To add a count value, add purely numeric text")
+                                    ), 
+                                    React.createElement("div", {className: "row top7"}, 
+                                        React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                            React.createElement(Link, {onClick: this.handleCreate.bind(this, 'count value'), className: this.state.countValue ? "btn btn-primary minw200" : "btn btn-primary minw200 hide", href: "#", role: "button"}, "Add Count Value")
+                                        )
+                                    )
+                                )
+                            ), 
+                            React.createElement("ul", {className: "list-group"}, 
+                                counts
+                            )
+                        )
+                    )
+        }
+    });
+
+module.exports = Count;
+
+},{"../stores/count-store.js":194,"../stores/details-store.js":195,"../util/api.js":197,"react":173,"react-router-component":6,"react/lib/merge":162}],182:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22595,8 +22752,10 @@ var Footer =
         render:function() {
             return React.createElement("nav", {className: "navbar navbar-default navbar-fixed-bottom"}, 
                     React.createElement("div", {className: "container"}, 
-                        React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {className: "footer", src: "powered-by-gcp.png"}))
+                        React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {className: "footer", src: "powered-by-gcp.png"})), 
+                        React.createElement("a", {href: "http://facebook.github.io/react/"}, React.createElement("img", {className: "footer", src: "react_flux.png"}))
                     )
+
                 )
 
         }
@@ -22604,7 +22763,7 @@ var Footer =
 
 module.exports = Footer;
 
-},{"react":173}],182:[function(require,module,exports){
+},{"react":173}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22654,7 +22813,7 @@ var Header =
 
 module.exports = Header;
 
-},{"../../actions/app-actions.js":177,"react":173,"react-router-component":6}],183:[function(require,module,exports){
+},{"../../actions/app-actions.js":177,"react":173,"react-router-component":6}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22677,7 +22836,7 @@ var Home =
 
 module.exports = Home;
 
-},{"../actions/app-actions.js":177,"react":173,"react-router-component":6}],184:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"react":173,"react-router-component":6}],185:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22690,11 +22849,12 @@ var Login =
 
 module.exports = Login;
 
-},{"react":173}],185:[function(require,module,exports){
+},{"react":173}],186:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var API = require('../util/api.js');
 var CountStore = require('../stores/count-store.js');
+var Link = require('react-router-component').Link;
 
 function myCounts(){
     return {myCounts: CountStore.getMyCounts()}
@@ -22719,13 +22879,12 @@ var MyCounts =
         render:function() {
 
             var counts = this.state.myCounts.map(function(item, i){
+                var detailsLink = "/count/" + item.id;
                 return (
-                    React.createElement("div", {className: "col-md-3 col-xs-3"}, 
+                    React.createElement("div", {className: "col-md-2 col-xs-2"}, 
                         React.createElement("div", {className: "well"}, 
                             React.createElement("div", {className: "row"}, 
-                                React.createElement("div", {className: "img-container"}, 
-                                    React.createElement("a", {href: "count/:count"}, React.createElement("img", {className: "count-summary", src: "numeric-over-time.png"}))
-                                )
+                                    React.createElement(Link, {href: detailsLink}, React.createElement("img", {className: "img-container", src: "numeric-over-time.png"}))
                             ), 
                             React.createElement("div", {className: "row"}, 
                                 React.createElement("span", {className: "label label-default"}, item.countName)
@@ -22733,7 +22892,7 @@ var MyCounts =
                         )
                     )
                 )
-            })
+            });
 
             return React.createElement("div", {className: "page-header"}, 
                 React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting")), 
@@ -22746,7 +22905,7 @@ var MyCounts =
 
 module.exports = MyCounts;
 
-},{"../stores/count-store.js":193,"../util/api.js":195,"react":173}],186:[function(require,module,exports){
+},{"../stores/count-store.js":194,"../util/api.js":197,"react":173,"react-router-component":6}],187:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22761,7 +22920,7 @@ var MyProfile =
 
 module.exports = MyProfile;
 
-},{"react":173}],187:[function(require,module,exports){
+},{"react":173}],188:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22776,15 +22935,18 @@ var SharedCounts =
 
 module.exports = SharedCounts;
 
-},{"react":173}],188:[function(require,module,exports){
+},{"react":173}],189:[function(require,module,exports){
 module.exports = {
     UPDATE_PROFILE: 'UPDATE_PROFILE',
     COUNT_ADDED: 'COUNT_ADDED',
     UPDATE_MY_COUNTS: 'UPDATE_MY_COUNTS',
-    UPDATE_PAGE: 'UPDATE_PAGE'
+    UPDATE_PAGE: 'UPDATE_PAGE',
+    UPDATE_COUNT_DETAILS: 'UPDATE_COUNT_DETAILS',
+    ADD_COUNT_TO_DETAILS: 'ADD_COUNT_TO_DETAILS',
+    DELETE_COUNT_ITEM_FROM_DETAILS: 'DELETE_COUNT_ITEM_FROM_DETAILS'
 };
 
-},{}],189:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js');
 var merge  = require('react/lib/merge');
 
@@ -22799,7 +22961,7 @@ var AppDispatcher = merge(Dispatcher.prototype, {
 
 module.exports = AppDispatcher;
 
-},{"./dispatcher.js":190,"react/lib/merge":162}],190:[function(require,module,exports){
+},{"./dispatcher.js":191,"react/lib/merge":162}],191:[function(require,module,exports){
 var Promise = require('es6-promise').Promise;
 var merge = require('react/lib/merge');
 
@@ -22856,7 +23018,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
 
 module.exports = Dispatcher;
 
-},{"es6-promise":1,"react/lib/merge":162}],191:[function(require,module,exports){
+},{"es6-promise":1,"react/lib/merge":162}],192:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -22866,7 +23028,7 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":179,"react":173}],192:[function(require,module,exports){
+},{"./components/app":179,"react":173}],193:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -22915,7 +23077,7 @@ var AppStore = merge(EventEmitter.prototype, {
 module.exports = AppStore;
 
 
-},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],193:[function(require,module,exports){
+},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],194:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -22925,14 +23087,21 @@ var EventEmitter = require('events').EventEmitter;
 var CHANGE_EVENT = "change";
 
 //These are the count objects
-var _myCounts = [];
+var _myCounts = [{id: 1, countType: 'Numeric over time', countName: 'weight loss'}];
+
+function _init() {
+    _myCounts[1] = {id: 1, countType: 'Numeric over time', countName: 'weight loss'};
+}
 
 function _updateMyCounts(myCounts){
-    _myCounts = myCounts;
+    var arrayLength = myCounts.length;
+    for (var i = 0; i < arrayLength; i++) {
+        _myCounts[myCounts[i].id] = myCounts[i];
+    }
 }
 
 function _addCount(count){
-    _myCounts.push(count);
+    _myCounts[count.id] = count;
 }
 
 var CountStore = merge(EventEmitter.prototype, {
@@ -22952,18 +23121,26 @@ var CountStore = merge(EventEmitter.prototype, {
         return _myCounts;
     },
 
+    getCount:function(countId){
+        if (_myCounts[countId] === undefined) {
+            _init();
+        }
+        return _myCounts[countId];
+    },
+
     dispatcherIndex:AppDispatcher.register(function(payload){
         var action = payload.action; // this is our action from handleViewAction
         switch(action.actionType){
             case AppConstants.COUNT_ADDED:
                 _addCount(payload.action.count);
+                console.log('_addCount');
                 break;
             case AppConstants.UPDATE_MY_COUNTS:
                 _updateMyCounts(payload.action.counts);
+                console.log('_updateMyCounts');
                 break;
         }
         CountStore.emitChange();
-
         return true;
     })
 });
@@ -22971,7 +23148,101 @@ var CountStore = merge(EventEmitter.prototype, {
 module.exports = CountStore;
 
 
-},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],194:[function(require,module,exports){
+},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
+/** @jsx React.DOM */
+var AppDispatcher = require('../dispatchers/app-dispatcher');
+var AppConstants = require('../constants/app-constants');
+var merge = require('react/lib/merge');
+var EventEmitter = require('events').EventEmitter;
+
+var CHANGE_EVENT = "change";
+
+//These are the details of the counts in the store
+var _countDetails = [];
+
+function _init() {
+    _countDetails[1] = {id: 1, counts:[{date: '2015-03-01', value:16.0},{date: '2015-03-04', value:14.0}]};
+}
+
+function _addCountToDetails(details) {
+    var detailsRecord = _countDetails[details.detailsId];
+    var counts = detailsRecord.counts;
+    counts.push({date:details.date, value:details.countValue});
+    detailsRecord.counts = counts;
+    _countDetails[details.detailId] = detailsRecord;
+}
+
+function _updateCountDetails(details){
+    _countDetails[details.id] = details;
+}
+
+function _deleteCountValueForDetail(countIdAndItem){
+    var detailsObj = _countDetails[countIdAndItem.detailsId];
+    var countsCopy = [];
+    var arrayLength = detailsObj.counts.length;
+    for (var i = 0; i < arrayLength; i++) {
+
+        console.log(detailsObj.counts[i]);
+        console.log(countIdAndItem.countItem);
+
+        if ((detailsObj.counts[i].value === countIdAndItem.countItem.value) &&
+            (detailsObj.counts[i].date === countIdAndItem.countItem.date)) {
+
+
+        } else {
+            countsCopy.push(detailsObj.counts[i]);
+        }
+    }
+    detailsObj.counts = countsCopy;
+
+    _countDetails[countIdAndItem.detailsId] = detailsObj;
+}
+
+var DetailsStore = merge(EventEmitter.prototype, {
+    emitChange:function(){
+        this.emit(CHANGE_EVENT)
+    },
+
+    addChangeListener:function(callback){
+        this.on(CHANGE_EVENT, callback)
+    },
+
+    removeChangeListener:function(callback){
+        this.removeListener(CHANGE_EVENT, callback)
+    },
+
+    getCountDetail:function(countId){
+        if (_countDetails[countId] === undefined) {
+            _init();
+        }
+        return _countDetails[countId];
+    },
+
+    dispatcherIndex:AppDispatcher.register(function(payload){
+        var action = payload.action; // this is our action from handleViewAction
+        switch(action.actionType){
+            case AppConstants.UPDATE_COUNT_DETAILS:
+                _updateCountDetails(payload.action.details);
+                break;
+            case AppConstants.ADD_COUNT_TO_DETAILS:
+                _addCountToDetails(payload.action.details);
+                break;
+            case AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS:
+                _deleteCountValueForDetail(payload.action.countIdAndItem);
+                break;
+
+        }
+
+        DetailsStore.emitChange();
+
+        return true;
+    })
+});
+
+module.exports = DetailsStore;
+
+
+},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],196:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -23020,14 +23291,17 @@ var PageStore = merge(EventEmitter.prototype, {
 module.exports = PageStore;
 
 
-},{"../constants/app-constants":188,"../dispatchers/app-dispatcher":189,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
+},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],197:[function(require,module,exports){
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
 var CountStore = require('../stores/count-store.js');
+var DetailsStore = require('../stores/details-store.js');
 
 var API = {
     //Main namespace for API object
 };
+
+var fakeId = 2;
 
 API.getProfile = function() {
 
@@ -23058,7 +23332,9 @@ API.createCount = function(countType, countName) {
     //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    AppActions.countAdded({countType: countType, countName: countName});
+
+    fakeId++;
+    AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
 
 };
 
@@ -23076,9 +23352,60 @@ API.getMyCounts = function() {
     //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    AppActions.updateMyCounts([{countType: 'test type', countName: 'test count'}]);
+
+    //AppActions.updateMyCounts([]);
+
+    return CountStore.getMyCounts();
 };
+
+API.getCountDetails = function(countId) {
+
+    //request
+    //    .get('/data/count/' + countId + '/details)
+    //    .end(function(res){
+    //        AppActions.updateCountDetails(res.body);
+    //    });
+
+    DetailsStore.getCountDetail(countId);
+
+};
+
+API.createCountValueForDetail = function(detailsId, date, countValue) {
+
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.sdfdfsd(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    AppActions.addCountToDetails({detailsId: detailsId, date: date, countValue: countValue});
+
+};
+
+API.deleteCountValueForDetail = function(detailsId, countItem) {
+
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.sdgsdfs(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    AppActions.deleteCountValueForDetail({detailsId: detailsId, countItem: countItem});
+
+}
 
 module.exports = API;
 
-},{"../actions/app-actions":177,"../stores/count-store.js":193,"superagent":174}]},{},[191])
+},{"../actions/app-actions":177,"../stores/count-store.js":194,"../stores/details-store.js":195,"superagent":174}]},{},[192])
