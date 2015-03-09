@@ -1,10 +1,13 @@
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
 var CountStore = require('../stores/count-store.js');
+var DetailsStore = require('../stores/details-store.js');
 
 var API = {
     //Main namespace for API object
 };
+
+var fakeId = 2;
 
 API.getProfile = function() {
 
@@ -35,7 +38,9 @@ API.createCount = function(countType, countName) {
     //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    AppActions.countAdded({countType: countType, countName: countName});
+
+    fakeId++;
+    AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
 
 };
 
@@ -53,7 +58,58 @@ API.getMyCounts = function() {
     //    });
 
     //Mocked server response -- TODO make a intelligent switch pattern here
-    AppActions.updateMyCounts([{countType: 'test type', countName: 'test count'}]);
+
+    //AppActions.updateMyCounts([]);
+
+    return CountStore.getMyCounts();
 };
+
+API.getCountDetails = function(countId) {
+
+    //request
+    //    .get('/data/count/' + countId + '/details)
+    //    .end(function(res){
+    //        AppActions.updateCountDetails(res.body);
+    //    });
+
+    DetailsStore.getCountDetail(countId);
+
+};
+
+API.createCountValueForDetail = function(detailsId, date, countValue) {
+
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.sdfdfsd(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    AppActions.addCountToDetails({detailsId: detailsId, date: date, countValue: countValue});
+
+};
+
+API.deleteCountValueForDetail = function(detailsId, countItem) {
+
+    //request
+    //    .post('data/count')
+    //    .send({ countType: 'countType', countName: 'countName' })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            AppActions.sdgsdfs(res.body);
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+
+    AppActions.deleteCountValueForDetail({detailsId: detailsId, countItem: countItem});
+
+}
 
 module.exports = API;

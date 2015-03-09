@@ -13,10 +13,18 @@
 
 .minh100 { min-height:100px; }
 .minh200 { min-height:200px; }
-.minh300 { min-height:300px; }s
+.minh300 { min-height:300px; }
 .minh400 { min-height:400px; }
 .minh500 { min-height:500px; }
 .minh600 { min-height:600px; }
 .minh700 { min-height:700px; }
 
-.janrainContent {height:95%; width:95%}
+.img-container{
+    height:100%;
+    max-height:100px;
+}
+
+.img-container-small{
+    height:100%;
+    max-height:50px;
+}

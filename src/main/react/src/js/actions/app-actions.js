@@ -20,10 +20,28 @@ var AppActions = {
             counts: counts
         })
     },
+    updateCountDetails:function(details){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.UPDATE_COUNT_DETAILS,
+            details: details
+        })
+    },
     updatePage:function(page){
         AppDispatcher.handleViewAction({
             actionType: AppConstants.UPDATE_PAGE,
             page: page
+        })
+    },
+    addCountToDetails:function(details){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.ADD_COUNT_TO_DETAILS,
+            details: details
+        })
+    },
+    deleteCountValueForDetail:function(countIdAndItem){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS,
+            countIdAndItem: countIdAndItem
         })
     }
 }

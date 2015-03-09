@@ -2,6 +2,7 @@
 var React = require('react');
 var API = require('../util/api.js');
 var CountStore = require('../stores/count-store.js');
+var Link = require('react-router-component').Link;
 
 function myCounts(){
     return {myCounts: CountStore.getMyCounts()}
@@ -26,11 +27,12 @@ var MyCounts =
         render:function() {
 
             var counts = this.state.myCounts.map(function(item, i){
+                var detailsLink = "/count/" + item.id;
                 return (
-                    <div className="col-md-3 col-xs-3">
+                    <div className="col-md-2 col-xs-2">
                         <div className="well">
                             <div className="row">
-                                <a href="count/:count"><img className="count-summary" src="numeric-over-time.png"></img></a>
+                                    <Link href={detailsLink}><img className="img-container" src="numeric-over-time.png"></img></Link>
                             </div>
                             <div className="row">
                                 <span className="label label-default">{item.countName}</span>
@@ -38,7 +40,7 @@ var MyCounts =
                         </div>
                     </div>
                 )
-            })
+            });
 
             return <div className="page-header">
                 <h1>My Counts <small>things I am counting</small></h1>

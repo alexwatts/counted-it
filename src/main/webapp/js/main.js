@@ -22723,7 +22723,9 @@ var MyCounts =
                     React.createElement("div", {className: "col-md-3 col-xs-3"}, 
                         React.createElement("div", {className: "well"}, 
                             React.createElement("div", {className: "row"}, 
-                                React.createElement("a", {href: "count/:count"}, React.createElement("img", {className: "count-summary", src: "numeric-over-time.png"}))
+                                React.createElement("div", {className: "img-container"}, 
+                                    React.createElement("a", {href: "count/:count"}, React.createElement("img", {className: "count-summary", src: "numeric-over-time.png"}))
+                                )
                             ), 
                             React.createElement("div", {className: "row"}, 
                                 React.createElement("span", {className: "label label-default"}, item.countName)

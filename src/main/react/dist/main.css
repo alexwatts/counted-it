@@ -19,8 +19,12 @@
 .minh600 { min-height:600px; }
 .minh700 { min-height:700px; }
 
-.janrainContent {height:95% !important; width:95% !important}
+.img-container{
+    height:100%;
+    max-height:100px;
+}
 
-#janrainEngageEmbed {
-    box-sizing: content-box;
+.img-container-small{
+    height:100%;
+    max-height:50px;
 }
