@@ -6,6 +6,7 @@ var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
 var SharedCounts = require('./shared-counts.js');
 var Count = require('./count.js');
+var Graph = require('./graph.js');
 var MyProfile = require('./my-profile.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
@@ -54,6 +55,7 @@ var App =
                         <Location path="/my-counts" handler={MyCounts}></Location>
                         <Location path="/shared-counts" handler={SharedCounts}></Location>
                         <Location path="/count/:countId" handler={Count}></Location>
+                        <Location path="/graph/:countId" handler={Graph}></Location>
                         <Location path="/my-profile" handler={MyProfile}></Location>
                     </Locations>
                 </Template>

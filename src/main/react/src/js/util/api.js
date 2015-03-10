@@ -61,7 +61,7 @@ API.getMyCounts = function() {
 
     //AppActions.updateMyCounts([]);
 
-    return CountStore.getMyCounts();
+    AppActions.updateMyCounts(CountStore.getMyCounts());
 };
 
 API.getCountDetails = function(countId) {
@@ -72,7 +72,7 @@ API.getCountDetails = function(countId) {
     //        AppActions.updateCountDetails(res.body);
     //    });
 
-    DetailsStore.getCountDetail(countId);
+    AppActions.updateCountDetails(DetailsStore.getCountDetail(countId));
 
 };
 

@@ -67,6 +67,9 @@ var Count =
         },
         render:function() {
             var that = this;
+
+            var showGraphLink = "/graph/" + this.props.countId;
+
             if (this.state.countDetails) {
                 var counts = this.state.countDetails.counts.map(function(item, i){
                     return (
@@ -83,7 +86,7 @@ var Count =
 
             return  <div>
                         <ol className="breadcrumb">
-                            <li><a href="#">My Counts</a></li>
+                            <li><Link href="/my-counts">My Counts</Link></li>
                             <li className="active">{this.state.count.countName}</li>
                         </ol>
                         <div className="panel panel-default">
@@ -97,10 +100,11 @@ var Count =
                             </div>
                             <div className="panel-body">
                                 <p>
+                                    <h3> Record a new value</h3>
                                     <div className="row">
                                         <div className="col-md-12 col-xs-12">
                                                 <div className="input-group">
-                                                    <button type="button" className="btn btn-default" aria-expanded="false">today</button>
+                                                    <span className="input-group-addon minw70">Date</span>
                                                     <input type="date" value={this.state.date} onChange={this.handleValueChange.bind(this, 'date')}/>
                                                 </div>
                                         </div>
@@ -114,7 +118,7 @@ var Count =
                                         </div>
                                     </div>
                                     <div className="row top7">
-                                        <div className={this.state.countValue ? "alert alert-warning hide" : "alert alert-warning" } role="alert">To add a count value, add purely numeric text</div>
+                                        <div className={this.state.countValue ? "alert alert-warning hide" : "alert alert-warning" } role="alert">To record a new value, enter some numeric text into the value field, after choosing a date for the value.</div>
                                     </div>
                                     <div className="row top7">
                                         <div className="col-md-12 col-xs-12">
@@ -123,6 +127,12 @@ var Count =
                                     </div>
                                 </p>
                             </div>
+                            <div className="row">
+                                <div className="col-md-12 col-xs-12">
+                                    <Link  className="btn btn-primary minw200" href={showGraphLink} role="button">Show Graph</Link>
+                                </div>
+                            </div>
+                            <h1> Previously recorded values</h1>
                             <ul className="list-group">
                                 {counts}
                             </ul>

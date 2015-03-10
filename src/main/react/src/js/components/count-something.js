@@ -29,6 +29,7 @@ var CountSomething =
         render:function() {
 
             return  <div>
+                        <h1> Choose something to Count</h1>
                         <div className="row">
                             <div className="col-md-12 col-xs-12">
                                 <div className="input-group">

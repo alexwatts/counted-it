@@ -22454,7 +22454,7 @@ var AppActions = {
 
 module.exports = AppActions;
 
-},{"../constants/app-constants.js":189,"../dispatchers/app-dispatcher.js":190}],178:[function(require,module,exports){
+},{"../constants/app-constants.js":190,"../dispatchers/app-dispatcher.js":191}],178:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
@@ -22475,7 +22475,7 @@ var Template =
 
 module.exports = Template;
 
-},{"./footer/footer.js":182,"./header/header.js":183,"react":173}],179:[function(require,module,exports){
+},{"./footer/footer.js":182,"./header/header.js":184,"react":173}],179:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Login = require('./login.js');
@@ -22484,6 +22484,7 @@ var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
 var SharedCounts = require('./shared-counts.js');
 var Count = require('./count.js');
+var Graph = require('./graph.js');
 var MyProfile = require('./my-profile.js');
 var Template = require('./app-template.js');
 var Router = require('react-router-component');
@@ -22532,6 +22533,7 @@ var App =
                         React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
                         React.createElement(Location, {path: "/shared-counts", handler: SharedCounts}), 
                         React.createElement(Location, {path: "/count/:countId", handler: Count}), 
+                        React.createElement(Location, {path: "/graph/:countId", handler: Graph}), 
                         React.createElement(Location, {path: "/my-profile", handler: MyProfile})
                     )
                 )
@@ -22541,7 +22543,7 @@ var App =
 
 module.exports = App;
 
-},{"../actions/app-actions.js":177,"../stores/app-store.js":193,"../stores/page-store.js":196,"../util/api.js":197,"./app-template.js":178,"./count-something.js":180,"./count.js":181,"./home.js":184,"./login.js":185,"./my-counts.js":186,"./my-profile.js":187,"./shared-counts.js":188,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"../stores/app-store.js":194,"../stores/page-store.js":197,"../util/api.js":198,"./app-template.js":178,"./count-something.js":180,"./count.js":181,"./graph.js":183,"./home.js":185,"./login.js":186,"./my-counts.js":187,"./my-profile.js":188,"./shared-counts.js":189,"react":173,"react-router-component":6,"react/lib/merge":162}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22573,6 +22575,7 @@ var CountSomething =
         render:function() {
 
             return  React.createElement("div", null, 
+                        React.createElement("h1", null, " Choose something to Count"), 
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
@@ -22607,7 +22610,7 @@ var CountSomething =
 
 module.exports = CountSomething;
 
-},{"../actions/app-actions.js":177,"../util/api.js":197,"react":173,"react-router-component":6}],181:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"../util/api.js":198,"react":173,"react-router-component":6}],181:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22677,6 +22680,9 @@ var Count =
         },
         render:function() {
             var that = this;
+
+            var showGraphLink = "/graph/" + this.props.countId;
+
             if (this.state.countDetails) {
                 var counts = this.state.countDetails.counts.map(function(item, i){
                     return (
@@ -22693,7 +22699,7 @@ var Count =
 
             return  React.createElement("div", null, 
                         React.createElement("ol", {className: "breadcrumb"}, 
-                            React.createElement("li", null, React.createElement("a", {href: "#"}, "My Counts")), 
+                            React.createElement("li", null, React.createElement(Link, {href: "/my-counts"}, "My Counts")), 
                             React.createElement("li", {className: "active"}, this.state.count.countName)
                         ), 
                         React.createElement("div", {className: "panel panel-default"}, 
@@ -22707,10 +22713,11 @@ var Count =
                             ), 
                             React.createElement("div", {className: "panel-body"}, 
                                 React.createElement("p", null, 
+                                    React.createElement("h3", null, " Record a new value"), 
                                     React.createElement("div", {className: "row"}, 
                                         React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                                 React.createElement("div", {className: "input-group"}, 
-                                                    React.createElement("button", {type: "button", className: "btn btn-default", "aria-expanded": "false"}, "today"), 
+                                                    React.createElement("span", {className: "input-group-addon minw70"}, "Date"), 
                                                     React.createElement("input", {type: "date", value: this.state.date, onChange: this.handleValueChange.bind(this, 'date')})
                                                 )
                                         )
@@ -22724,7 +22731,7 @@ var Count =
                                         )
                                     ), 
                                     React.createElement("div", {className: "row top7"}, 
-                                        React.createElement("div", {className: this.state.countValue ? "alert alert-warning hide" : "alert alert-warning", role: "alert"}, "To add a count value, add purely numeric text")
+                                        React.createElement("div", {className: this.state.countValue ? "alert alert-warning hide" : "alert alert-warning", role: "alert"}, "To record a new value, enter some numeric text into the value field, after choosing a date for the value.")
                                     ), 
                                     React.createElement("div", {className: "row top7"}, 
                                         React.createElement("div", {className: "col-md-12 col-xs-12"}, 
@@ -22733,6 +22740,12 @@ var Count =
                                     )
                                 )
                             ), 
+                            React.createElement("div", {className: "row"}, 
+                                React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                    React.createElement(Link, {className: "btn btn-primary minw200", href: showGraphLink, role: "button"}, "Show Graph")
+                                )
+                            ), 
+                            React.createElement("h1", null, " Previously recorded values"), 
                             React.createElement("ul", {className: "list-group"}, 
                                 counts
                             )
@@ -22743,19 +22756,18 @@ var Count =
 
 module.exports = Count;
 
-},{"../stores/count-store.js":194,"../stores/details-store.js":195,"../util/api.js":197,"react":173,"react-router-component":6,"react/lib/merge":162}],182:[function(require,module,exports){
+},{"../stores/count-store.js":195,"../stores/details-store.js":196,"../util/api.js":198,"react":173,"react-router-component":6,"react/lib/merge":162}],182:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
 var Footer =
     React.createClass({displayName: "Footer",
         render:function() {
-            return React.createElement("nav", {className: "navbar navbar-default navbar-fixed-bottom"}, 
+            return React.createElement("nav", {className: "navbar navbar-default navbar"}, 
                     React.createElement("div", {className: "container"}, 
                         React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {className: "footer", src: "powered-by-gcp.png"})), 
-                        React.createElement("a", {href: "http://facebook.github.io/react/"}, React.createElement("img", {className: "footer", src: "react_flux.png"}))
+                        React.createElement("a", {className: "pull-right", href: "http://facebook.github.io/react/"}, React.createElement("img", {className: "footer", src: "react_flux.png"}))
                     )
-
                 )
 
         }
@@ -22764,6 +22776,142 @@ var Footer =
 module.exports = Footer;
 
 },{"react":173}],183:[function(require,module,exports){
+/** @jsx React.DOM */
+var React = require('react');
+var Link = require('react-router-component').Link;
+var API = require('../util/api.js');
+var CountStore = require('../stores/count-store.js');
+var DetailsStore = require('../stores/details-store.js');
+var merge  = require('react/lib/merge');
+
+function countDetails(countId){
+    return {countDetails: DetailsStore.getCountDetail(countId)};
+}
+
+function count(countId){
+    return {count: CountStore.getCount(countId)};
+}
+
+function date(date) {
+    return date;
+}
+
+var Count =
+    React.createClass({displayName: "Count",
+        componentDidMount:function() {
+            //Initialise store objects
+            API.getCountDetails(this.props.countId);
+        },
+        componentWillMount:function() {
+            //Listen for updates from the stores
+            DetailsStore.addChangeListener(this._onDetailsChange);
+        },
+        _onDetailsChange:function() {
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+        },
+        getInitialState:function() {
+            var countObj = count(this.props.countId);
+            var countDetailsObj = countDetails(this.props.countId);
+
+            var initialStateObj = merge(countObj, countDetailsObj);
+
+            return initialStateObj;
+        },
+        shouldComponentUpdate: function(nextProps, nextState) {
+            // If we have no data (we are expecting an array in this example), we won't render the chart
+            return true;
+        },
+        componentDidUpdate: function() {
+            this.renderChart();
+        },
+        render:function() {
+
+            var countHref = "/count/" + this.state.count.id;
+
+            var graphContainerRef = React.DOM.div({className: "chart", ref: "chartNode"});
+
+            return  React.createElement("div", null, 
+                        React.createElement("ol", {className: "breadcrumb"}, 
+                            React.createElement("li", null, React.createElement(Link, {href: "/my-counts"}, "My Counts")), 
+                            React.createElement("li", null, React.createElement(Link, {href: countHref}, this.state.count.countName)), 
+                            React.createElement("li", {className: "active"}, "Graph")
+                        ), 
+                        graphContainerRef
+                    )
+        },
+        renderChart: function() {
+            var that = this;
+            var node = this.refs.chartNode.getDOMNode();
+            jQuery(function ($) {
+                $(node).highcharts({
+                    chart: {
+                        type: 'spline'
+                    },
+                    title: {
+                        text: that.state.count.countName
+                    },
+                    subtitle: {
+                        text: 'Source: counted.it'
+                    },
+                    xAxis: {
+                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Temperature'
+                        },
+                        labels: {
+                            formatter: function () {
+                                return this.value + '°';
+                            }
+                        }
+                    },
+                    tooltip: {
+                        crosshairs: true,
+                        shared: true
+                    },
+                    plotOptions: {
+                        spline: {
+                            marker: {
+                                radius: 4,
+                                lineColor: '#666666',
+                                lineWidth: 1
+                            }
+                        }
+                    },
+                    series: [{
+                        name: 'Tokyo',
+                        marker: {
+                            symbol: 'square'
+                        },
+                        data: [7.0, 6.9, 9.5, 14.5, 18.2, 21.5, 25.2, {
+                            y: 26.5,
+                            marker: {
+                                symbol: 'url(http://www.highcharts.com/demo/gfx/sun.png)'
+                            }
+                        }, 23.3, 18.3, 13.9, 9.6]
+
+                    }, {
+                        name: 'London',
+                        marker: {
+                            symbol: 'diamond'
+                        },
+                        data: [{
+                            y: 3.9,
+                            marker: {
+                                symbol: 'url(http://www.highcharts.com/demo/gfx/snow.png)'
+                            }
+                        }, 4.2, 5.7, 8.5, 11.9, 15.2, 17.0, 16.6, 14.2, 10.3, 6.6, 4.8]
+                    }]
+                });
+            });
+        }
+    });
+
+module.exports = Count;
+
+},{"../stores/count-store.js":195,"../stores/details-store.js":196,"../util/api.js":198,"react":173,"react-router-component":6,"react/lib/merge":162}],184:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22813,7 +22961,7 @@ var Header =
 
 module.exports = Header;
 
-},{"../../actions/app-actions.js":177,"react":173,"react-router-component":6}],184:[function(require,module,exports){
+},{"../../actions/app-actions.js":177,"react":173,"react-router-component":6}],185:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -22836,7 +22984,7 @@ var Home =
 
 module.exports = Home;
 
-},{"../actions/app-actions.js":177,"react":173,"react-router-component":6}],185:[function(require,module,exports){
+},{"../actions/app-actions.js":177,"react":173,"react-router-component":6}],186:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22849,7 +22997,7 @@ var Login =
 
 module.exports = Login;
 
-},{"react":173}],186:[function(require,module,exports){
+},{"react":173}],187:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var API = require('../util/api.js');
@@ -22905,7 +23053,7 @@ var MyCounts =
 
 module.exports = MyCounts;
 
-},{"../stores/count-store.js":194,"../util/api.js":197,"react":173,"react-router-component":6}],187:[function(require,module,exports){
+},{"../stores/count-store.js":195,"../util/api.js":198,"react":173,"react-router-component":6}],188:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22920,7 +23068,7 @@ var MyProfile =
 
 module.exports = MyProfile;
 
-},{"react":173}],188:[function(require,module,exports){
+},{"react":173}],189:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -22935,7 +23083,7 @@ var SharedCounts =
 
 module.exports = SharedCounts;
 
-},{"react":173}],189:[function(require,module,exports){
+},{"react":173}],190:[function(require,module,exports){
 module.exports = {
     UPDATE_PROFILE: 'UPDATE_PROFILE',
     COUNT_ADDED: 'COUNT_ADDED',
@@ -22946,7 +23094,7 @@ module.exports = {
     DELETE_COUNT_ITEM_FROM_DETAILS: 'DELETE_COUNT_ITEM_FROM_DETAILS'
 };
 
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js');
 var merge  = require('react/lib/merge');
 
@@ -22961,7 +23109,7 @@ var AppDispatcher = merge(Dispatcher.prototype, {
 
 module.exports = AppDispatcher;
 
-},{"./dispatcher.js":191,"react/lib/merge":162}],191:[function(require,module,exports){
+},{"./dispatcher.js":192,"react/lib/merge":162}],192:[function(require,module,exports){
 var Promise = require('es6-promise').Promise;
 var merge = require('react/lib/merge');
 
@@ -23018,7 +23166,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
 
 module.exports = Dispatcher;
 
-},{"es6-promise":1,"react/lib/merge":162}],192:[function(require,module,exports){
+},{"es6-promise":1,"react/lib/merge":162}],193:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -23028,7 +23176,7 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":179,"react":173}],193:[function(require,module,exports){
+},{"./components/app":179,"react":173}],194:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -23077,7 +23225,7 @@ var AppStore = merge(EventEmitter.prototype, {
 module.exports = AppStore;
 
 
-},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],194:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -23148,7 +23296,7 @@ var CountStore = merge(EventEmitter.prototype, {
 module.exports = CountStore;
 
 
-},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],195:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":162}],196:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -23242,7 +23390,7 @@ var DetailsStore = merge(EventEmitter.prototype, {
 module.exports = DetailsStore;
 
 
-},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],196:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":162}],197:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -23291,7 +23439,7 @@ var PageStore = merge(EventEmitter.prototype, {
 module.exports = PageStore;
 
 
-},{"../constants/app-constants":189,"../dispatchers/app-dispatcher":190,"events":2,"react/lib/merge":162}],197:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":162}],198:[function(require,module,exports){
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
 var CountStore = require('../stores/count-store.js');
@@ -23355,7 +23503,7 @@ API.getMyCounts = function() {
 
     //AppActions.updateMyCounts([]);
 
-    return CountStore.getMyCounts();
+    AppActions.updateMyCounts(CountStore.getMyCounts());
 };
 
 API.getCountDetails = function(countId) {
@@ -23366,7 +23514,7 @@ API.getCountDetails = function(countId) {
     //        AppActions.updateCountDetails(res.body);
     //    });
 
-    DetailsStore.getCountDetail(countId);
+    AppActions.updateCountDetails(DetailsStore.getCountDetail(countId));
 
 };
 
@@ -23408,4 +23556,4 @@ API.deleteCountValueForDetail = function(detailsId, countItem) {
 
 module.exports = API;
 
-},{"../actions/app-actions":177,"../stores/count-store.js":194,"../stores/details-store.js":195,"superagent":174}]},{},[192])
+},{"../actions/app-actions":177,"../stores/count-store.js":195,"../stores/details-store.js":196,"superagent":174}]},{},[193])
