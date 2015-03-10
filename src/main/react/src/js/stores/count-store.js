@@ -7,21 +7,19 @@ var EventEmitter = require('events').EventEmitter;
 var CHANGE_EVENT = "change";
 
 //These are the count objects
-var _myCounts = [{id: 1, countType: 'Numeric over time', countName: 'weight loss'}];
+var _myCounts = [];
 
-function _init() {
-    _myCounts[1] = {id: 1, countType: 'Numeric over time', countName: 'weight loss'};
-}
 
 function _updateMyCounts(myCounts){
+    _myCounts = [];
     var arrayLength = myCounts.length;
     for (var i = 0; i < arrayLength; i++) {
-        _myCounts[myCounts[i].id] = myCounts[i];
+        _myCounts.push(myCounts[i]);
     }
 }
 
 function _addCount(count){
-    _myCounts[count.id] = count;
+    _myCounts.push(count);
 }
 
 var CountStore = merge(EventEmitter.prototype, {
@@ -42,10 +40,13 @@ var CountStore = merge(EventEmitter.prototype, {
     },
 
     getCount:function(countId){
-        if (_myCounts[countId] === undefined) {
-            _init();
-        }
-        return _myCounts[countId];
+        var itemToReturn;
+        _myCounts.map(function(item, i) {
+            if (parseInt(item.id) === parseInt(countId)) {
+                itemToReturn = item;
+            }
+        });
+        return itemToReturn;
     },
 
     dispatcherIndex:AppDispatcher.register(function(payload){

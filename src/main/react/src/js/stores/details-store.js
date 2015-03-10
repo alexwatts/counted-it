@@ -9,20 +9,18 @@ var CHANGE_EVENT = "change";
 //These are the details of the counts in the store
 var _countDetails = [];
 
-function _init() {
-    _countDetails[1] = {id: 1, counts:[{date: '2015-03-01', value:16.0},{date: '2015-03-04', value:14.0}]};
-}
-
 function _addCountToDetails(details) {
-    var detailsRecord = _countDetails[details.detailsId];
-    var counts = detailsRecord.counts;
-    counts.push({date:details.date, value:details.countValue});
+    var detailsRecord = _countDetails[details.countId];
+    var counts = detailsRecord.countDetailsValues;
+    counts.push({id: details.id, date:details.date, value:details.value});
     detailsRecord.counts = counts;
-    _countDetails[details.detailId] = detailsRecord;
+    _countDetails[details.countId] = detailsRecord;
 }
 
 function _updateCountDetails(details){
-    _countDetails[details.id] = details;
+    console.log('_updateCountDetails');
+    console.log(details);
+    _countDetails[details.countId] = details;
 }
 
 function _deleteCountValueForDetail(countIdAndItem){
@@ -61,9 +59,6 @@ var DetailsStore = merge(EventEmitter.prototype, {
     },
 
     getCountDetail:function(countId){
-        if (_countDetails[countId] === undefined) {
-            _init();
-        }
         return _countDetails[countId];
     },
 
@@ -79,7 +74,6 @@ var DetailsStore = merge(EventEmitter.prototype, {
             case AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS:
                 _deleteCountValueForDetail(payload.action.countIdAndItem);
                 break;
-
         }
 
         DetailsStore.emitChange();

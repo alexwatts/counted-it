@@ -1,35 +1,30 @@
 package com.whats.service.user;
 
-import com.whats.dao.users.UserDao;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import com.googlecode.objectify.Key;
 
-public class UserServiceImpl implements UserService {
+import com.whats.model.User;
+import com.whats.service.BaseObjectifyService;
 
-    private UserDao userDao;
+public class UserServiceImpl extends BaseObjectifyService implements UserService {
 
-    public void registerUser(User registration) throws UsernameExistsException {
-
-        if (userDao.checkUsernameExists(registration.getUsername())) {
-
-            throw new UsernameExistsException();
-
-        } else {
-
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            User userWithDigestedPassword = new User(
-                    registration.getUsername(),
-                    encoder.encode(registration.getPassword()),
-                    registration.getFirstName(),
-                    registration.getLastName(),
-                    registration.getPostcode(),
-                    registration.getSocial());
-
-            userDao.saveUser(userWithDigestedPassword);
-
-        }
+    public User createUser(String identifier) {
+        User newUser = new User();
+        newUser.setId(identifier);
+        getObjectify().save().entity(newUser).now();
+        return newUser;
     }
 
-    public void setUserDao(UserDao userDao) {
-        this.userDao = userDao;
+    public User getUser(String identifier) {
+        //Load existing user with its key
+        Key<User> rootKey = Key.create(User.class, identifier);
+        User user = getObjectify().load().key(rootKey).now();
+        return user;
     }
+
+    public void addCountKeyToUser(User creatingUser, Key countKey) {
+        User user = getUser(creatingUser.getId());
+        user.addCount(countKey);
+        getObjectify().save().entity(user).now();
+    }
+
 }

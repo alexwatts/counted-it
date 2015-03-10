@@ -1,9 +1,8 @@
 package com.whats.login;
 
-import com.google.appengine.api.users.UserService;
-import com.google.appengine.api.users.UserServiceFactory;
 import com.google.appengine.repackaged.org.codehaus.jackson.JsonParseException;
 import com.whats.service.urlfetch.URLFetchService;
+import com.whats.service.user.UserService;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -33,7 +32,7 @@ public class LoginController {
 
     private ObjectMapper objectMapper;
 
-    private UserService userService = UserServiceFactory.getUserService();
+    private UserService userService;
 
     Logger LOGGER = Logger.getLogger(this.getClass().getName());
 
@@ -57,6 +56,11 @@ public class LoginController {
 
             //Put the Auth object in the session
             request.getSession().setAttribute("auth", janrainAuth);
+
+            //Create the user record if required
+            if (userService.getUser(janrainAuth.getProfile().getIdentifier()) == null) {
+                userService.createUser(janrainAuth.getProfile().getIdentifier());
+            }
 
             SavedRequest savedRequest =
                     new HttpSessionRequestCache().getRequest(request, response);
@@ -100,5 +104,9 @@ public class LoginController {
 
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

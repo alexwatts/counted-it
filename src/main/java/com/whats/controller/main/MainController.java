@@ -35,7 +35,7 @@ public class MainController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "profile", method = RequestMethod.GET)
+    @RequestMapping(value = "data/profile", method = RequestMethod.GET)
     @ResponseBody
     public JanrainAuth getAuth(HttpServletRequest request) {
 
@@ -64,6 +64,12 @@ public class MainController {
     @RequestMapping(value = "my-profile", method = RequestMethod.GET)
     @ResponseBody
     public ModelAndView myProfile() {
+        return new ModelAndView("index");
+    }
+
+    @RequestMapping(value = "graph", method = RequestMethod.GET)
+    @ResponseBody
+    public ModelAndView graph() {
         return new ModelAndView("index");
     }
 

@@ -1,11 +1,11 @@
 package com.whats.service.user;
 
-import com.whats.dao.users.UserDao;
+import com.whats.model.User;
 
 public interface UserService {
 
-    void registerUser(User registration) throws UsernameExistsException;
+    User createUser(String identifier);
 
-    void setUserDao(UserDao userDao);
+    User getUser(String identifier);
 
 }

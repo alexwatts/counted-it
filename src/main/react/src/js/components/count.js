@@ -24,26 +24,35 @@ var Count =
             //Initialise store objects
             API.getCountDetails(this.props.countId);
         },
+        componentWillUnmount:function() {
+            //Cleanup store objects
+            DetailsStore.removeChangeListener(this._onDetailsChange);
+        },
         componentWillMount:function() {
             //Listen for updates from the stores
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            console.log('details change!');
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
+                console.log('react updated my state, yay');
+            });
+
+
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
             var countDetailsObj = countDetails(this.props.countId);
 
             var formObj = {
-                countValue: '',
+                value: '',
+                countName: '',
+                count: {countName: ''},
+                countDetails: {countDetailsValues: []},
                 date: date(this.getTodaysDate())
             };
 
             var initialStateObj = merge(merge(countObj, countDetailsObj), formObj);
-
-            console.log(initialStateObj);
 
             return initialStateObj;
         },
@@ -70,19 +79,20 @@ var Count =
 
             var showGraphLink = "/graph/" + this.props.countId;
 
-            if (this.state.countDetails) {
-                var counts = this.state.countDetails.counts.map(function(item, i){
+            console.log(this.state.countDetails);
+            //if (this.state.countDetails) {
+                var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                     return (
                         <li className="list-group-item">
                             <div className="row">
                                 <div className="col-md-2 col-xs-2">value: {item.value}</div>
                                 <div className="col-md-3 col-xs-3">date: {item.date}</div>
-                                <div className="col-md-3 col-xs-3"><button data={item} className="btn btn-danger" onClick={that.handleDelete.bind(this, item)}>Delete</button></div>
+                                <div className="col-md-3 col-xs-3"><button data={item} className="btn btn-danger" onClick={that.handleDelete.bind(null, item)}>Delete</button></div>
                             </div>
                         </li>
                     )
                 });
-            }
+            //}
 
             return  <div>
                         <ol className="breadcrumb">
@@ -105,7 +115,7 @@ var Count =
                                         <div className="col-md-12 col-xs-12">
                                                 <div className="input-group">
                                                     <span className="input-group-addon minw70">Date</span>
-                                                    <input type="date" value={this.state.date} onChange={this.handleValueChange.bind(this, 'date')}/>
+                                                    <input type="date" value={this.state.date} onChange={this.handleValueChange.bind(null, 'date')}/>
                                                 </div>
                                         </div>
                                     </div>
@@ -113,7 +123,7 @@ var Count =
                                         <div className="col-md-12 col-xs-12">
                                             <div className="input-group">
                                                 <span className="input-group-addon minw70">Value</span>
-                                                <input type="number" className="form-control" aria-label="" value={this.state.countValue} onChange={this.handleValueChange.bind(this, 'countValue')}/>
+                                                <input type="number" className="form-control" aria-label="" value={this.state.countValue} onChange={this.handleValueChange.bind(null, 'countValue')}/>
                                             </div>
                                         </div>
                                     </div>

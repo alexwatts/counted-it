@@ -27,6 +27,17 @@
         <security:authentication-provider ref='janrainAuthenticationProvider'/>
     </security:authentication-manager>
 
+    <bean id="objectifyFactoryBean" class="com.googlecode.objectify.spring.ObjectifyFactoryBean">
+        <property name="classes">
+            <list>
+                <value>com.whats.model.User</value>
+                <value>com.whats.model.Count</value>
+                <value>com.whats.model.CountDetails</value>
+                <value>com.whats.model.CountDetailsValue</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="janrainAuthenticationProvider" class="com.whats.login.JanrainAuthenticationProvider">
     </bean>
 
@@ -39,6 +50,26 @@
     <bean id="loginController" class="com.whats.login.LoginController">
         <property name="urlFetchService" ref="urlFetchService"/>
         <property name="objectMapper" ref="objectMapper"/>
+        <property name="userService" ref="userService"/>
+    </bean>
+
+    <bean id="countController" class="com.whats.controller.main.CountController">
+        <property name="countService" ref="countService"/>
+        <property name="userService" ref="userService"/>
+        <property name="countDetailsService" ref="countDetailsService"/>
+        <property name="objectMapper" ref="objectMapper"/>
+    </bean>
+
+    <bean id="userService" class="com.whats.service.user.UserServiceImpl">
+        <property name="objectifyFactoryBean" ref="objectifyFactoryBean"/>
+    </bean>
+
+    <bean id="countService" class="com.whats.service.count.CountServiceImpl">
+        <property name="objectifyFactoryBean" ref="objectifyFactoryBean"/>
+    </bean>
+
+    <bean id="countDetailsService" class="com.whats.service.countdetails.CountDetailsServiceImpl">
+        <property name="objectifyFactoryBean" ref="objectifyFactoryBean"/>
     </bean>
 
     <bean id="mainController" class="com.whats.controller.main.MainController">

@@ -1,6 +1,5 @@
 /** @jsx React.DOM */
 var React = require('react');
-var Login = require('./login.js');
 var Home = require('./home.js');
 var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
