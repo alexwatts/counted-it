@@ -33,9 +33,9 @@ var Count =
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
-                console.log('react updated my state, yay');
-            });
+            if (this.isMounted()) {
+                this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            }
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -68,7 +68,6 @@ var Count =
             API.createCountValueForDetail(this.props.countId, this.state.date, this.state.countValue);
         },
         handleDelete: function (item, e) {
-            console.log(item);
             API.deleteCountValueForDetail(this.props.countId, item);
         },
         render:function() {

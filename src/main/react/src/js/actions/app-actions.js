@@ -43,7 +43,14 @@ var AppActions = {
             actionType: AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS,
             countIdAndItem: countIdAndItem
         })
+    },
+    deleteCount:function(count){
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.DELETE_COUNT,
+            count: count
+        })
     }
+
 }
 
 module.exports = AppActions;

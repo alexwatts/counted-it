@@ -130,6 +130,15 @@ public class CountController {
 
     }
 
+    @RequestMapping(value = "data/count/{countId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public void deleteCount(
+            @PathVariable Long countId) {
+
+        countService.deleteCount(countId);
+
+    }
+
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }

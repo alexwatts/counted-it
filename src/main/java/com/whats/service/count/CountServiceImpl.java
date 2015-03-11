@@ -2,6 +2,7 @@ package com.whats.service.count;
 
 import com.googlecode.objectify.Key;
 import com.whats.model.Count;
+import com.whats.model.CountDetails;
 import com.whats.service.BaseObjectifyService;
 
 import java.util.Collection;
@@ -15,6 +16,27 @@ public class CountServiceImpl extends BaseObjectifyService implements CountServi
         count.setCountName(countName);
         getObjectify().save().entity(count).now();
         return count;
+    }
+
+    public void deleteCount(Long countId) {
+
+        //This ain't transaction, but it needs to be.
+
+        Count loadedCount = getObjectify().load().key(Key.create(Count.class, countId)).now();
+
+        CountDetails countDetails = getObjectify().load().key(loadedCount.getCountDetailsKey()).now();
+
+        //Delete the Value records
+        if (countDetails.getCountDetailsValueKeys() != null && !countDetails.getCountDetailsValueKeys().isEmpty()) {
+            getObjectify().delete().keys(countDetails.getCountDetailsValueKeys()).now();
+        }
+
+        //Delete the count detail record
+        getObjectify().delete().key(loadedCount.getCountDetailsKey()).now();
+
+        //Delete count record
+        getObjectify().delete().key(Key.create(Count.class, countId)).now();
+
     }
 
     public Count getCount(Long id) {

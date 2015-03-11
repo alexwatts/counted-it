@@ -25496,12 +25496,20 @@ var AppActions = {
             actionType: AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS,
             countIdAndItem: countIdAndItem
         })
+    },
+    deleteCount:function(count){
+        console.log('dispatching action');
+        AppDispatcher.handleViewAction({
+            actionType: AppConstants.DELETE_COUNT,
+            count: count
+        })
     }
+
 }
 
 module.exports = AppActions;
 
-},{"../constants/app-constants.js":191,"../dispatchers/app-dispatcher.js":192}],179:[function(require,module,exports){
+},{"../constants/app-constants.js":190,"../dispatchers/app-dispatcher.js":191}],179:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Header = require('./header/header.js');
@@ -25525,7 +25533,6 @@ module.exports = Template;
 },{"./footer/footer.js":183,"./header/header.js":185,"react":174}],180:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-var Login = require('./login.js');
 var Home = require('./home.js');
 var CountSomething = require('./count-something.js');
 var MyCounts = require('./my-counts.js');
@@ -25538,6 +25545,7 @@ var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
 var PageStore = require('../stores/page-store.js');
+var CountStore = require('../stores/count-store.js');
 var merge = require('react/lib/merge');
 var AppActions = require('../actions/app-actions.js');
 
@@ -25550,6 +25558,9 @@ function profile(){
 function page(){
     return {page: PageStore.getPage()}
 }
+function myCounts(){
+    return {myCounts: CountStore.getMyCounts()}
+}
 
 var App =
     React.createClass({displayName: "App",
@@ -25559,8 +25570,9 @@ var App =
         },
         componentWillMount:function(){
             //Listen for updates from the stores
-            AppStore.addChangeListener(this._onProfileChange)
-            PageStore.addChangeListener(this._onPageChange)
+            AppStore.addChangeListener(this._onProfileChange);
+            PageStore.addChangeListener(this._onPageChange);
+            CountStore.addChangeListener(this._onCountsChange);
         },
         getInitialState:function(){
             return merge(profile(), page());
@@ -25571,6 +25583,9 @@ var App =
         _onPageChange:function(){
             this.setState(page())
         },
+        _onCountsChange:function(){
+            this.setState(myCounts());
+        },
         render:function() {
             return (
                 React.createElement(Template, {profile: this.state.profile, page: this.state.page}, 
@@ -25579,7 +25594,7 @@ var App =
                         React.createElement(Location, {path: "/count", handler: CountSomething}), 
                         React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
                         React.createElement(Location, {path: "/shared-counts", handler: SharedCounts}), 
-                        React.createElement(Location, {path: "/count/:countId", handler: Count}), 
+                        React.createElement(Location, {path: "/count/:countId", handler: Count, ajw: this.state.page}), 
                         React.createElement(Location, {path: "/graph/:countId", handler: Graph}), 
                         React.createElement(Location, {path: "/my-profile", handler: MyProfile})
                     )
@@ -25590,7 +25605,7 @@ var App =
 
 module.exports = App;
 
-},{"../actions/app-actions.js":178,"../stores/app-store.js":195,"../stores/page-store.js":198,"../util/api.js":199,"./app-template.js":179,"./count-something.js":181,"./count.js":182,"./graph.js":184,"./home.js":186,"./login.js":187,"./my-counts.js":188,"./my-profile.js":189,"./shared-counts.js":190,"react":174,"react-router-component":7,"react/lib/merge":163}],181:[function(require,module,exports){
+},{"../actions/app-actions.js":178,"../stores/app-store.js":194,"../stores/count-store.js":195,"../stores/page-store.js":197,"../util/api.js":198,"./app-template.js":179,"./count-something.js":181,"./count.js":182,"./graph.js":184,"./home.js":186,"./my-counts.js":187,"./my-profile.js":188,"./shared-counts.js":189,"react":174,"react-router-component":7,"react/lib/merge":163}],181:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -25657,7 +25672,7 @@ var CountSomething =
 
 module.exports = CountSomething;
 
-},{"../actions/app-actions.js":178,"../util/api.js":199,"react":174,"react-router-component":7}],182:[function(require,module,exports){
+},{"../actions/app-actions.js":178,"../util/api.js":198,"react":174,"react-router-component":7}],182:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -25684,26 +25699,32 @@ var Count =
             //Initialise store objects
             API.getCountDetails(this.props.countId);
         },
+        componentWillUnmount:function() {
+            //Cleanup store objects
+            DetailsStore.removeChangeListener(this._onDetailsChange);
+        },
         componentWillMount:function() {
             //Listen for updates from the stores
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            console.log('details change!');
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
+                console.log('react updated my state, yay');
+            });
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
             var countDetailsObj = countDetails(this.props.countId);
 
             var formObj = {
-                countValue: '',
+                value: '',
+                countName: '',
+                count: {countName: ''},
+                countDetails: {countDetailsValues: []},
                 date: date(this.getTodaysDate())
             };
 
             var initialStateObj = merge(merge(countObj, countDetailsObj), formObj);
-
-            console.log(initialStateObj);
 
             return initialStateObj;
         },
@@ -25722,7 +25743,6 @@ var Count =
             API.createCountValueForDetail(this.props.countId, this.state.date, this.state.countValue);
         },
         handleDelete: function (item, e) {
-            console.log(item);
             API.deleteCountValueForDetail(this.props.countId, item);
         },
         render:function() {
@@ -25730,19 +25750,19 @@ var Count =
 
             var showGraphLink = "/graph/" + this.props.countId;
 
-            if (this.state.countDetails) {
-                var counts = this.state.countDetails.counts.map(function(item, i){
+            //if (this.state.countDetails) {
+                var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                     return (
                         React.createElement("li", {className: "list-group-item"}, 
                             React.createElement("div", {className: "row"}, 
                                 React.createElement("div", {className: "col-md-2 col-xs-2"}, "value: ", item.value), 
                                 React.createElement("div", {className: "col-md-3 col-xs-3"}, "date: ", item.date), 
-                                React.createElement("div", {className: "col-md-3 col-xs-3"}, React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(this, item)}, "Delete"))
+                                React.createElement("div", {className: "col-md-3 col-xs-3"}, React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(null, item)}, "Delete"))
                             )
                         )
                     )
                 });
-            }
+            //}
 
             return  React.createElement("div", null, 
                         React.createElement("ol", {className: "breadcrumb"}, 
@@ -25765,7 +25785,7 @@ var Count =
                                         React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                                 React.createElement("div", {className: "input-group"}, 
                                                     React.createElement("span", {className: "input-group-addon minw70"}, "Date"), 
-                                                    React.createElement("input", {type: "date", value: this.state.date, onChange: this.handleValueChange.bind(this, 'date')})
+                                                    React.createElement("input", {type: "date", value: this.state.date, onChange: this.handleValueChange.bind(null, 'date')})
                                                 )
                                         )
                                     ), 
@@ -25773,7 +25793,7 @@ var Count =
                                         React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                             React.createElement("div", {className: "input-group"}, 
                                                 React.createElement("span", {className: "input-group-addon minw70"}, "Value"), 
-                                                React.createElement("input", {type: "number", className: "form-control", "aria-label": "", value: this.state.countValue, onChange: this.handleValueChange.bind(this, 'countValue')})
+                                                React.createElement("input", {type: "number", className: "form-control", "aria-label": "", value: this.state.countValue, onChange: this.handleValueChange.bind(null, 'countValue')})
                                             )
                                         )
                                     ), 
@@ -25803,7 +25823,7 @@ var Count =
 
 module.exports = Count;
 
-},{"../stores/count-store.js":196,"../stores/details-store.js":197,"../util/api.js":199,"react":174,"react-router-component":7,"react/lib/merge":163}],183:[function(require,module,exports){
+},{"../stores/count-store.js":195,"../stores/details-store.js":196,"../util/api.js":198,"react":174,"react-router-component":7,"react/lib/merge":163}],183:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -25853,10 +25873,13 @@ var Count =
         },
         componentWillMount:function() {
             //Listen for updates from the stores
-            DetailsStore.addChangeListener(this._onDetailsChange);
+            //DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
+                console.log('react updated my state, yay');
+            });
+
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -25877,7 +25900,7 @@ var Count =
 
             var seriesData = [];
 
-            var counts = this.state.countDetails.counts.map(function(item, i){
+            var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                 var date = moment(item.date).toDate();
                 seriesData.push([Date.UTC(date.getUTCFullYear(),  date.getUTCMonth(), date.getUTCDate()), parseFloat(item.value)])
             });
@@ -25902,6 +25925,8 @@ var Count =
         },
         renderChart: function() {
             var that = this;
+
+            console.log('debugging renderChart');
 
             var seriesData = this.getSeriesData();
 
@@ -25948,12 +25973,6 @@ var Count =
 
                     series: [{
                         name: 'Plot of recorded values',
-                        // Define the data points. All series have a dummy year
-                        // of 1970/71 in order to be compared on the same x axis. Note
-                        // that in JavaScript, months start at 0 for January, 1 for February etc.
-
-                        //YYYY-MM-DD
-
                         data: that.getSeriesData()
                     }]
                 });
@@ -25963,7 +25982,7 @@ var Count =
 
 module.exports = Count;
 
-},{"../stores/count-store.js":196,"../stores/details-store.js":197,"../util/api.js":199,"moment":4,"react":174,"react-router-component":7,"react/lib/merge":163}],185:[function(require,module,exports){
+},{"../stores/count-store.js":195,"../stores/details-store.js":196,"../util/api.js":198,"moment":4,"react":174,"react-router-component":7,"react/lib/merge":163}],185:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
@@ -26039,31 +26058,14 @@ module.exports = Home;
 },{"../actions/app-actions.js":178,"react":174,"react-router-component":7}],187:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
-
-var Login =
-    React.createClass({displayName: "Login",
-        render:function() {
-            return React.createElement("div", null, "Some component")
-        }
-    });
-
-module.exports = Login;
-
-},{"react":174}],188:[function(require,module,exports){
-/** @jsx React.DOM */
-var React = require('react');
 var API = require('../util/api.js');
 var CountStore = require('../stores/count-store.js');
 var Link = require('react-router-component').Link;
 
-function myCounts(){
-    return {myCounts: CountStore.getMyCounts()}
-}
-
 var MyCounts =
     React.createClass({displayName: "MyCounts",
         getInitialState:function(){
-            return myCounts();
+            return {myCounts: []};
         },
         componentDidMount:function(){
             //Initialise store objects
@@ -26071,14 +26073,15 @@ var MyCounts =
         },
         componentWillMount:function(){
             //Listen for updates from the stores
-            CountStore.addChangeListener(this._onCountsChange)
+            //CountStore.addChangeListener(this._onCountsChange)
         },
-        _onCountsChange:function(){
-            this.setState(myCounts())
+        handleDelete: function (item, e) {
+            API.deleteCount(item);
         },
         render:function() {
-
+            var that = this;
             var counts = this.state.myCounts.map(function(item, i){
+
                 var detailsLink = "/count/" + item.id;
                 return (
                     React.createElement("div", {className: "col-md-2 col-xs-2"}, 
@@ -26088,6 +26091,9 @@ var MyCounts =
                             ), 
                             React.createElement("div", {className: "row"}, 
                                 React.createElement("span", {className: "label label-default"}, item.countName)
+                            ), 
+                            React.createElement("div", {className: "row"}, 
+                                React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(null, item)}, "Delete")
                             )
                         )
                     )
@@ -26105,7 +26111,7 @@ var MyCounts =
 
 module.exports = MyCounts;
 
-},{"../stores/count-store.js":196,"../util/api.js":199,"react":174,"react-router-component":7}],189:[function(require,module,exports){
+},{"../stores/count-store.js":195,"../util/api.js":198,"react":174,"react-router-component":7}],188:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -26120,7 +26126,7 @@ var MyProfile =
 
 module.exports = MyProfile;
 
-},{"react":174}],190:[function(require,module,exports){
+},{"react":174}],189:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 
@@ -26135,7 +26141,7 @@ var SharedCounts =
 
 module.exports = SharedCounts;
 
-},{"react":174}],191:[function(require,module,exports){
+},{"react":174}],190:[function(require,module,exports){
 module.exports = {
     UPDATE_PROFILE: 'UPDATE_PROFILE',
     COUNT_ADDED: 'COUNT_ADDED',
@@ -26143,10 +26149,11 @@ module.exports = {
     UPDATE_PAGE: 'UPDATE_PAGE',
     UPDATE_COUNT_DETAILS: 'UPDATE_COUNT_DETAILS',
     ADD_COUNT_TO_DETAILS: 'ADD_COUNT_TO_DETAILS',
-    DELETE_COUNT_ITEM_FROM_DETAILS: 'DELETE_COUNT_ITEM_FROM_DETAILS'
+    DELETE_COUNT_ITEM_FROM_DETAILS: 'DELETE_COUNT_ITEM_FROM_DETAILS',
+    DELETE_COUNT: 'DELETE_COUNT'
 };
 
-},{}],192:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 var Dispatcher = require('./dispatcher.js');
 var merge  = require('react/lib/merge');
 
@@ -26161,7 +26168,7 @@ var AppDispatcher = merge(Dispatcher.prototype, {
 
 module.exports = AppDispatcher;
 
-},{"./dispatcher.js":193,"react/lib/merge":163}],193:[function(require,module,exports){
+},{"./dispatcher.js":192,"react/lib/merge":163}],192:[function(require,module,exports){
 var Promise = require('es6-promise').Promise;
 var merge = require('react/lib/merge');
 
@@ -26218,7 +26225,7 @@ Dispatcher.prototype = merge(Dispatcher.prototype, {
 
 module.exports = Dispatcher;
 
-},{"es6-promise":1,"react/lib/merge":163}],194:[function(require,module,exports){
+},{"es6-promise":1,"react/lib/merge":163}],193:[function(require,module,exports){
 /** @jsx React.DOM */
 var App = require('./components/app');
 var React = require('react');
@@ -26228,7 +26235,7 @@ React.renderComponent(
     document.getElementById('main'));
 
 
-},{"./components/app":180,"react":174}],195:[function(require,module,exports){
+},{"./components/app":180,"react":174}],194:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -26277,7 +26284,7 @@ var AppStore = merge(EventEmitter.prototype, {
 module.exports = AppStore;
 
 
-},{"../constants/app-constants":191,"../dispatchers/app-dispatcher":192,"events":2,"react/lib/merge":163}],196:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":163}],195:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -26287,21 +26294,39 @@ var EventEmitter = require('events').EventEmitter;
 var CHANGE_EVENT = "change";
 
 //These are the count objects
-var _myCounts = [{id: 1, countType: 'Numeric over time', countName: 'weight loss'}];
+var _myCounts = [];
 
-function _init() {
-    _myCounts[1] = {id: 1, countType: 'Numeric over time', countName: 'weight loss'};
-}
 
 function _updateMyCounts(myCounts){
+    _myCounts = [];
     var arrayLength = myCounts.length;
     for (var i = 0; i < arrayLength; i++) {
-        _myCounts[myCounts[i].id] = myCounts[i];
+        _myCounts.push(myCounts[i]);
     }
 }
 
 function _addCount(count){
-    _myCounts[count.id] = count;
+    _myCounts.push(count);
+}
+
+function _deleteCount(count){
+    console.log(count);
+    console.log('1');
+    var countsCopy = [];
+    console.log('2');
+    var arrayLength = _myCounts.length;
+    console.log('3');
+    for (var i = 0; i < arrayLength; i++) {
+        console.log('4');
+        if (_myCounts[i].id === count.countId) {
+            //dont' copy
+        } else {
+            console.log('5');
+            countsCopy.push(_myCounts[i]);
+        }
+    }
+    console.log('6');
+    _myCounts = countsCopy;
 }
 
 var CountStore = merge(EventEmitter.prototype, {
@@ -26322,25 +26347,33 @@ var CountStore = merge(EventEmitter.prototype, {
     },
 
     getCount:function(countId){
-        if (_myCounts[countId] === undefined) {
-            _init();
-        }
-        return _myCounts[countId];
+        var itemToReturn;
+        _myCounts.map(function(item, i) {
+            if (parseInt(item.id) === parseInt(countId)) {
+                itemToReturn = item;
+            }
+        });
+        return itemToReturn;
     },
 
     dispatcherIndex:AppDispatcher.register(function(payload){
+
+        console.log('picking up action');
         var action = payload.action; // this is our action from handleViewAction
         switch(action.actionType){
             case AppConstants.COUNT_ADDED:
                 _addCount(payload.action.count);
-                console.log('_addCount');
                 break;
             case AppConstants.UPDATE_MY_COUNTS:
                 _updateMyCounts(payload.action.counts);
-                console.log('_updateMyCounts');
+                break;
+            case AppConstants.DELETE_COUNT:
+                _deleteCount(payload.action.count);
                 break;
         }
+        console.log('emmitting change');
         CountStore.emitChange();
+        console.log('change emitted');
         return true;
     })
 });
@@ -26348,7 +26381,7 @@ var CountStore = merge(EventEmitter.prototype, {
 module.exports = CountStore;
 
 
-},{"../constants/app-constants":191,"../dispatchers/app-dispatcher":192,"events":2,"react/lib/merge":163}],197:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":163}],196:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -26360,42 +26393,38 @@ var CHANGE_EVENT = "change";
 //These are the details of the counts in the store
 var _countDetails = [];
 
-function _init() {
-    _countDetails[1] = {id: 1, counts:[{date: '2015-03-01', value:16.0},{date: '2015-03-04', value:14.0}]};
-}
-
 function _addCountToDetails(details) {
-    var detailsRecord = _countDetails[details.detailsId];
-    var counts = detailsRecord.counts;
-    counts.push({date:details.date, value:details.countValue});
+    var detailsRecord = _countDetails[details.countId];
+    var counts = detailsRecord.countDetailsValues;
+    counts.push({id: details.id, date:details.date, value:details.value});
     detailsRecord.counts = counts;
-    _countDetails[details.detailId] = detailsRecord;
+    _countDetails[details.countId] = detailsRecord;
 }
 
 function _updateCountDetails(details){
-    _countDetails[details.id] = details;
+    console.log('_updateCountDetails');
+    console.log(details);
+    _countDetails[details.countId] = details;
 }
 
 function _deleteCountValueForDetail(countIdAndItem){
-    var detailsObj = _countDetails[countIdAndItem.detailsId];
-    var countsCopy = [];
-    var arrayLength = detailsObj.counts.length;
+
+    var detailsValueId =  countIdAndItem.detailsValueId;
+    var detailsRecord = _countDetails[countIdAndItem.countId];
+    var detailsRecordValues = detailsRecord.countDetailsValues;
+    var detailsRecordValuesCopy = [];
+
+    var arrayLength = detailsRecordValues.length;
     for (var i = 0; i < arrayLength; i++) {
-
-        console.log(detailsObj.counts[i]);
-        console.log(countIdAndItem.countItem);
-
-        if ((detailsObj.counts[i].value === countIdAndItem.countItem.value) &&
-            (detailsObj.counts[i].date === countIdAndItem.countItem.date)) {
-
-
+        if (detailsRecordValues[i].id === detailsValueId) {
+            //dont' copy
         } else {
-            countsCopy.push(detailsObj.counts[i]);
+            detailsRecordValuesCopy.push(detailsRecordValues[i]);
         }
     }
-    detailsObj.counts = countsCopy;
+    detailsRecord.countDetailsValues = detailsRecordValuesCopy;
+    _countDetails[countIdAndItem.countId] = detailsRecord;
 
-    _countDetails[countIdAndItem.detailsId] = detailsObj;
 }
 
 var DetailsStore = merge(EventEmitter.prototype, {
@@ -26412,9 +26441,6 @@ var DetailsStore = merge(EventEmitter.prototype, {
     },
 
     getCountDetail:function(countId){
-        if (_countDetails[countId] === undefined) {
-            _init();
-        }
         return _countDetails[countId];
     },
 
@@ -26430,7 +26456,6 @@ var DetailsStore = merge(EventEmitter.prototype, {
             case AppConstants.DELETE_COUNT_ITEM_FROM_DETAILS:
                 _deleteCountValueForDetail(payload.action.countIdAndItem);
                 break;
-
         }
 
         DetailsStore.emitChange();
@@ -26442,7 +26467,7 @@ var DetailsStore = merge(EventEmitter.prototype, {
 module.exports = DetailsStore;
 
 
-},{"../constants/app-constants":191,"../dispatchers/app-dispatcher":192,"events":2,"react/lib/merge":163}],198:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":163}],197:[function(require,module,exports){
 /** @jsx React.DOM */
 var AppDispatcher = require('../dispatchers/app-dispatcher');
 var AppConstants = require('../constants/app-constants');
@@ -26491,121 +26516,96 @@ var PageStore = merge(EventEmitter.prototype, {
 module.exports = PageStore;
 
 
-},{"../constants/app-constants":191,"../dispatchers/app-dispatcher":192,"events":2,"react/lib/merge":163}],199:[function(require,module,exports){
+},{"../constants/app-constants":190,"../dispatchers/app-dispatcher":191,"events":2,"react/lib/merge":163}],198:[function(require,module,exports){
 var request = require('superagent');
 var AppActions = require('../actions/app-actions');
 var CountStore = require('../stores/count-store.js');
-var DetailsStore = require('../stores/details-store.js');
+var merge = require('react/lib/merge');
 
 var API = {
     //Main namespace for API object
 };
 
-var fakeId = 2;
-
 API.getProfile = function() {
-
-    var profileObject = {};
-
-    //request
-    //    .get('/profile')
-    //    .end(function(res){
-    //        AppActions.updateProfile(res.body);
-    //    });
-
-    //Mocked server response -- TODO make a intelligent switch pattern here
-    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
+    request
+        .get('/data/profile')
+        .end(function(res){
+            AppActions.updateProfile(res.body);
+        });
 };
 
-API.createCount = function(countType, countName) {
-
-    //request
-    //    .post('data/count')
-    //    .send({ countType: 'countType', countName: 'countName' })
-    //    .set('Accept', 'application/json')
-    //    .end(function(res){
-    //        if (res.ok) {
-    //            AppActions.countAdded(res.body);
-    //        } else {
-    //            alert('Problem saving new count ' + res.text);
-    //        }
-    //    });
-
-    //Mocked server response -- TODO make a intelligent switch pattern here
-
-    fakeId++;
-    AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
-
+API.createCount = function(countType, countName, callback) {
+    request
+        .post('data/count')
+        .send({ countType: countType, countName: countName })
+        .set('Accept', 'application/json')
+        .end(function(res){
+            if (res.ok) {
+                callback.apply('/my-counts');
+                //AppActions.countAdded(res.body);
+            } else {
+                alert('Problem saving new count ' + res.text);
+            }
+        });
 };
 
 API.getMyCounts = function() {
-
-    //Only fetch counts if we dont' already have em. Need to design this out for obvious reasons
-    if (CountStore.getMyCounts() && CountStore.getMyCounts().length > 0) {
-        return;
-    }
-
-    //request
-    //    .get('/data/my-counts')
-    //    .end(function(res){
-    //        AppActions.updateMyCounts(res.body);
-    //    });
-
-    //Mocked server response -- TODO make a intelligent switch pattern here
-
-    //AppActions.updateMyCounts([]);
-
-    AppActions.updateMyCounts(CountStore.getMyCounts());
+    request
+        .get('/data/my-counts')
+        .end(function(res){
+            AppActions.updateMyCounts(res.body);
+        });
 };
 
 API.getCountDetails = function(countId) {
-
-    //request
-    //    .get('/data/count/' + countId + '/details)
-    //    .end(function(res){
-    //        AppActions.updateCountDetails(res.body);
-    //    });
-
-    AppActions.updateCountDetails(DetailsStore.getCountDetail(countId));
-
+    request
+        .get('/data/count/' + countId + '/details')
+        .end(function(res){
+            AppActions.updateCountDetails(merge({countId: countId}, res.body));
+        });
 };
 
-API.createCountValueForDetail = function(detailsId, date, countValue) {
-
-    //request
-    //    .post('data/count')
-    //    .send({ countType: 'countType', countName: 'countName' })
-    //    .set('Accept', 'application/json')
-    //    .end(function(res){
-    //        if (res.ok) {
-    //            AppActions.sdfdfsd(res.body);
-    //        } else {
-    //            alert('Problem saving new count ' + res.text);
-    //        }
-    //    });
-
-    AppActions.addCountToDetails({detailsId: detailsId, date: date, countValue: countValue});
-
+API.createCountValueForDetail = function(countId, date, value) {
+    request
+        .post('/data/count/' + countId + '/details')
+        .send({date: date, value: value })
+        .set('Accept', 'application/json')
+        .end(function(res){
+            if (res.ok) {
+                AppActions.addCountToDetails(merge({countId: countId}, res.body));
+            } else {
+                alert('Problem saving new count ' + res.text);
+            }
+        });
 };
 
-API.deleteCountValueForDetail = function(detailsId, countItem) {
+API.deleteCountValueForDetail = function(countId, item) {
+    request
+        .del('/data/count/' + countId + '/details')
+        .query('detailsValueId=' + item.id)
+        .set('Accept', 'application/json')
+        .end(function(res){
+            if (res.ok) {
+                AppActions.deleteCountValueForDetail(merge({countId: countId, detailsValueId: item.id}));
+            } else {
+                alert('Problem saving new count ' + res.text);
+            }
+        });
+};
 
-    //request
-    //    .post('data/count')
-    //    .send({ countType: 'countType', countName: 'countName' })
-    //    .set('Accept', 'application/json')
-    //    .end(function(res){
-    //        if (res.ok) {
-    //            AppActions.sdgsdfs(res.body);
-    //        } else {
-    //            alert('Problem saving new count ' + res.text);
-    //        }
-    //    });
-
-    AppActions.deleteCountValueForDetail({detailsId: detailsId, countItem: countItem});
-
-}
+API.deleteCount = function(item) {
+    request
+        .del('/data/count/' + item.id)
+        .set('Accept', 'application/json')
+        .end(function(res){
+            if (res.ok) {
+                AppActions.deleteCount({countId: item.id});
+            } else {
+                alert('Problem saving new count ' + res.text);
+            }
+        });
+};
 
 module.exports = API;
 
-},{"../actions/app-actions":178,"../stores/count-store.js":196,"../stores/details-store.js":197,"superagent":175}]},{},[194])
+},{"../actions/app-actions":178,"../stores/count-store.js":195,"react/lib/merge":163,"superagent":175}]},{},[193])

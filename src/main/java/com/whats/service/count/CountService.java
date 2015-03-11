@@ -17,4 +17,6 @@ public interface CountService {
 
     void addCountDetailsKeyToCount(Count creatingCount, Key countDetailsKey);
 
+    void deleteCount(Long countId);
+
 }

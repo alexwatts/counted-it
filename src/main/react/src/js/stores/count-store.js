@@ -22,6 +22,19 @@ function _addCount(count){
     _myCounts.push(count);
 }
 
+function _deleteCount(count){
+    var countsCopy = [];
+    var arrayLength = _myCounts.length;
+    for (var i = 0; i < arrayLength; i++) {
+        if (_myCounts[i].id === count.countId) {
+            //dont' copy
+        } else {
+            countsCopy.push(_myCounts[i]);
+        }
+    }
+    _myCounts = countsCopy;
+}
+
 var CountStore = merge(EventEmitter.prototype, {
     emitChange:function(){
         this.emit(CHANGE_EVENT)
@@ -50,15 +63,17 @@ var CountStore = merge(EventEmitter.prototype, {
     },
 
     dispatcherIndex:AppDispatcher.register(function(payload){
+
         var action = payload.action; // this is our action from handleViewAction
         switch(action.actionType){
             case AppConstants.COUNT_ADDED:
                 _addCount(payload.action.count);
-                console.log('_addCount');
                 break;
             case AppConstants.UPDATE_MY_COUNTS:
                 _updateMyCounts(payload.action.counts);
-                console.log('_updateMyCounts');
+                break;
+            case AppConstants.DELETE_COUNT:
+                _deleteCount(payload.action.count);
                 break;
         }
         CountStore.emitChange();

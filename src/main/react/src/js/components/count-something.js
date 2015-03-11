@@ -3,9 +3,13 @@ var React = require('react');
 var Link = require('react-router-component').Link;
 var API = require('../util/api.js');
 var AppActions = require('../actions/app-actions.js');
+var NavigatableMixin = require('react-router-component').NavigatableMixin;
 
 var CountSomething =
     React.createClass({
+
+        mixins:[NavigatableMixin],
+
         getInitialState: function () {
             return {
                 countType: '',
@@ -18,14 +22,17 @@ var CountSomething =
             this.setState(change);
         },
         handleClick: function (name, e) {
+
             var change = {};
             change[name] = e.target.text;
             this.setState(change);
         },
-        handleCreate: function () {
-            API.createCount(this.state.countType, this.state.countText);
-            AppActions.updatePage('MyCounts');
+        handleCreate: function (item, e) {
+            var that = this;
+            e.preventDefault();
+            API.createCount(this.state.countType, this.state.countText, this.navigate, this)
         },
+
         render:function() {
 
             return  <div>

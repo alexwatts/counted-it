@@ -20,7 +20,7 @@ function date(date) {
     return date;
 }
 
-var Count =
+var Graph =
     React.createClass({
         componentDidMount:function() {
             //Initialise store objects
@@ -31,10 +31,9 @@ var Count =
             //DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
-                console.log('react updated my state, yay');
-            });
-
+            if (this.isMounted()) {
+                this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            }
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -135,4 +134,4 @@ var Count =
         }
     });
 
-module.exports = Count;
+module.exports = Graph;
