@@ -24,25 +24,23 @@ function _updateCountDetails(details){
 }
 
 function _deleteCountValueForDetail(countIdAndItem){
-    var detailsObj = _countDetails[countIdAndItem.detailsId];
-    var countsCopy = [];
-    var arrayLength = detailsObj.counts.length;
+
+    var detailsValueId =  countIdAndItem.detailsValueId;
+    var detailsRecord = _countDetails[countIdAndItem.countId];
+    var detailsRecordValues = detailsRecord.countDetailsValues;
+    var detailsRecordValuesCopy = [];
+
+    var arrayLength = detailsRecordValues.length;
     for (var i = 0; i < arrayLength; i++) {
-
-        console.log(detailsObj.counts[i]);
-        console.log(countIdAndItem.countItem);
-
-        if ((detailsObj.counts[i].value === countIdAndItem.countItem.value) &&
-            (detailsObj.counts[i].date === countIdAndItem.countItem.date)) {
-
-
+        if (detailsRecordValues[i].id === detailsValueId) {
+            //dont' copy
         } else {
-            countsCopy.push(detailsObj.counts[i]);
+            detailsRecordValuesCopy.push(detailsRecordValues[i]);
         }
     }
-    detailsObj.counts = countsCopy;
+    detailsRecord.countDetailsValues = detailsRecordValuesCopy;
+    _countDetails[countIdAndItem.countId] = detailsRecord;
 
-    _countDetails[countIdAndItem.detailsId] = detailsObj;
 }
 
 var DetailsStore = merge(EventEmitter.prototype, {

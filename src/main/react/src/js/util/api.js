@@ -88,15 +88,15 @@ API.createCountValueForDetail = function(countId, date, value) {
 
 };
 
-API.deleteCountValueForDetail = function(countId, detailsValueId) {
+API.deleteCountValueForDetail = function(countId, item) {
 
     request
         .del('/data/count/' + countId + '/details')
-        .send({detailsValueId: detailsValueId})
+        .query('detailsValueId=' + item.id)
         .set('Accept', 'application/json')
         .end(function(res){
             if (res.ok) {
-                AppActions.deleteCountValueForDetail(merge({countId: countId, detailsValueId: detailsValueId}, res.body));
+                AppActions.deleteCountValueForDetail(merge({countId: countId, detailsValueId: item.id}));
             } else {
                 alert('Problem saving new count ' + res.text);
             }

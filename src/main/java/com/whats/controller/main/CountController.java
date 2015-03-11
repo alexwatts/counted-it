@@ -117,6 +117,7 @@ public class CountController {
     }
 
     @RequestMapping(value = "data/count/{countId}/details", method = RequestMethod.DELETE)
+    @ResponseBody
     public void deleteCountValueForDetails(
             @PathVariable Long countId,
             @RequestParam(required = true) Long detailsValueId) {
@@ -124,7 +125,9 @@ public class CountController {
         Count count = countService.getCount(countId);
         CountDetails countDetails = countDetailsService.getCountDetails(count.getCountDetailsKey().getId());
 
-        countDetailsService.deleteCountDetailsValue(count.getCountDetailsKey(), Key.create(CountDetailsValue.class, detailsValueId));
+        countDetailsService.deleteCountDetailsValue(count.getCountDetailsKey(),
+                Key.create(CountDetailsValue.class, detailsValueId));
+
     }
 
     public void setObjectMapper(ObjectMapper objectMapper) {

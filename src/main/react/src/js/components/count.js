@@ -33,12 +33,9 @@ var Count =
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-
             this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
                 console.log('react updated my state, yay');
             });
-
-
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -79,7 +76,6 @@ var Count =
 
             var showGraphLink = "/graph/" + this.props.countId;
 
-            console.log(this.state.countDetails);
             //if (this.state.countDetails) {
                 var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                     return (

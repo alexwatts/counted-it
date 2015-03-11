@@ -28,10 +28,13 @@ var Count =
         },
         componentWillMount:function() {
             //Listen for updates from the stores
-            DetailsStore.addChangeListener(this._onDetailsChange);
+            //DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
+                console.log('react updated my state, yay');
+            });
+
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -52,7 +55,7 @@ var Count =
 
             var seriesData = [];
 
-            var counts = this.state.countDetails.counts.map(function(item, i){
+            var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                 var date = moment(item.date).toDate();
                 seriesData.push([Date.UTC(date.getUTCFullYear(),  date.getUTCMonth(), date.getUTCDate()), parseFloat(item.value)])
             });
@@ -77,6 +80,8 @@ var Count =
         },
         renderChart: function() {
             var that = this;
+
+            console.log('debugging renderChart');
 
             var seriesData = this.getSeriesData();
 

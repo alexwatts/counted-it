@@ -25692,12 +25692,9 @@ var Count =
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-
             this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
                 console.log('react updated my state, yay');
             });
-
-
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -25738,7 +25735,6 @@ var Count =
 
             var showGraphLink = "/graph/" + this.props.countId;
 
-            console.log(this.state.countDetails);
             //if (this.state.countDetails) {
                 var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                     return (
@@ -25862,10 +25858,13 @@ var Count =
         },
         componentWillMount:function() {
             //Listen for updates from the stores
-            DetailsStore.addChangeListener(this._onDetailsChange);
+            //DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
+                console.log('react updated my state, yay');
+            });
+
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -25886,7 +25885,7 @@ var Count =
 
             var seriesData = [];
 
-            var counts = this.state.countDetails.counts.map(function(item, i){
+            var counts = this.state.countDetails.countDetailsValues.map(function(item, i){
                 var date = moment(item.date).toDate();
                 seriesData.push([Date.UTC(date.getUTCFullYear(),  date.getUTCMonth(), date.getUTCDate()), parseFloat(item.value)])
             });
@@ -25911,6 +25910,8 @@ var Count =
         },
         renderChart: function() {
             var that = this;
+
+            console.log('debugging renderChart');
 
             var seriesData = this.getSeriesData();
 
@@ -26366,25 +26367,23 @@ function _updateCountDetails(details){
 }
 
 function _deleteCountValueForDetail(countIdAndItem){
-    var detailsObj = _countDetails[countIdAndItem.detailsId];
-    var countsCopy = [];
-    var arrayLength = detailsObj.counts.length;
+
+    var detailsValueId =  countIdAndItem.detailsValueId;
+    var detailsRecord = _countDetails[countIdAndItem.countId];
+    var detailsRecordValues = detailsRecord.countDetailsValues;
+    var detailsRecordValuesCopy = [];
+
+    var arrayLength = detailsRecordValues.length;
     for (var i = 0; i < arrayLength; i++) {
-
-        console.log(detailsObj.counts[i]);
-        console.log(countIdAndItem.countItem);
-
-        if ((detailsObj.counts[i].value === countIdAndItem.countItem.value) &&
-            (detailsObj.counts[i].date === countIdAndItem.countItem.date)) {
-
-
+        if (detailsRecordValues[i].id === detailsValueId) {
+            //dont' copy
         } else {
-            countsCopy.push(detailsObj.counts[i]);
+            detailsRecordValuesCopy.push(detailsRecordValues[i]);
         }
     }
-    detailsObj.counts = countsCopy;
+    detailsRecord.countDetailsValues = detailsRecordValuesCopy;
+    _countDetails[countIdAndItem.countId] = detailsRecord;
 
-    _countDetails[countIdAndItem.detailsId] = detailsObj;
 }
 
 var DetailsStore = merge(EventEmitter.prototype, {
@@ -26567,15 +26566,15 @@ API.createCountValueForDetail = function(countId, date, value) {
 
 };
 
-API.deleteCountValueForDetail = function(countId, detailsValueId) {
+API.deleteCountValueForDetail = function(countId, item) {
 
     request
         .del('/data/count/' + countId + '/details')
-        .send({detailsValueId: detailsValueId})
+        .query('detailsValueId=' + item.id)
         .set('Accept', 'application/json')
         .end(function(res){
             if (res.ok) {
-                AppActions.deleteCountValueForDetail(merge({countId: countId, detailsValueId: detailsValueId}, res.body));
+                AppActions.deleteCountValueForDetail(merge({countId: countId, detailsValueId: item.id}));
             } else {
                 alert('Problem saving new count ' + res.text);
             }
