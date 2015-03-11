@@ -97,7 +97,7 @@ var Count =
                         <div className="panel panel-default">
                             <div className="panel-heading">
                                 <div className="row">
-                                    <img className="img-container-small" src="../numeric-over-time.png"></img>
+                                    <img className="img-container" src="../numeric-over-time.png"></img>
                                 </div>
                                 <div className="row">
                                     <span className="label label-default">{this.state.count.countName}</span>

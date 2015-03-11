@@ -25773,7 +25773,7 @@ var Count =
                         React.createElement("div", {className: "panel panel-default"}, 
                             React.createElement("div", {className: "panel-heading"}, 
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("img", {className: "img-container-small", src: "../numeric-over-time.png"})
+                                    React.createElement("img", {className: "img-container", src: "../numeric-over-time.png"})
                                 ), 
                                 React.createElement("div", {className: "row"}, 
                                     React.createElement("span", {className: "label label-default"}, this.state.count.countName)
