@@ -106,13 +106,13 @@ var Graph =
                     },
                     yAxis: {
                         title: {
-                            text: 'X Axix (state)'
+                            text: 'Value'
                         },
                         min: 0
                     },
                     tooltip: {
                         headerFormat: '<b>{series.name}</b><br>',
-                        pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+                        pointFormat: '{point.x:%e. %b}: {point.y:.2f}'
                     },
 
                     plotOptions: {
@@ -124,7 +124,7 @@ var Graph =
                     },
 
                     series: [{
-                        name: 'Plot of recorded values',
+                        name: 'Recorded Values',
                         data: that.getSeriesData()
                     }]
                 });

@@ -25518,7 +25518,7 @@ var Template =
     React.createClass({displayName: "Template",
         render:function(){
             return (
-                React.createElement("div", {className: "container-fluid"}, 
+                React.createElement("div", {className: "container"}, 
                     React.createElement(Header, {profile: this.props.profile, page: this.props.page}), 
                     this.props.children, 
                     React.createElement(Footer, null)
@@ -25638,7 +25638,8 @@ var CountSomething =
         render:function() {
 
             return  React.createElement("div", null, 
-                        React.createElement("h1", null, " Choose something to Count"), 
+                        React.createElement("h1", null, " Create a new count"), 
+                        React.createElement("div", {className: "alert alert-warning", role: "alert"}, "Select a Count type using the Type arrow button, then enter a Name for your count eg. Weight Loss. When you've finished you can click Create Count"), 
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
@@ -25773,10 +25774,23 @@ var Count =
                         React.createElement("div", {className: "panel panel-default"}, 
                             React.createElement("div", {className: "panel-heading"}, 
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("img", {className: "img-container", src: "../numeric-over-time.png"})
+                                    React.createElement("span", {className: "glyphicon glyphicon-stats glyph-large"})
                                 ), 
+
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("span", {className: "label label-default"}, this.state.count.countName)
+                                    React.createElement("h2", null, " ", this.state.count.countName, " - ", React.createElement("small", null, "You have ", this.state.countDetails.countDetailsValues.length, " recorded values"), " "), 
+
+                                    React.createElement("div", {className: "row"}, 
+                                        React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                            React.createElement(Link, {className: "btn btn-primary minw200", href: showGraphLink, role: "button"}, "Show Graph")
+                                        )
+                                    ), 
+
+                                    React.createElement("ul", {className: "list-group"}, 
+                                        counts, 
+                                        counts
+                                    )
+
                                 )
                             ), 
                             React.createElement("div", {className: "panel-body"}, 
@@ -25807,15 +25821,6 @@ var Count =
                                         )
                                     )
                                 )
-                            ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("div", {className: "col-md-12 col-xs-12"}, 
-                                    React.createElement(Link, {className: "btn btn-primary minw200", href: showGraphLink, role: "button"}, "Show Graph")
-                                )
-                            ), 
-                            React.createElement("h1", null, " Previously recorded values"), 
-                            React.createElement("ul", {className: "list-group"}, 
-                                counts
                             )
                         )
                     )
@@ -25831,7 +25836,7 @@ var React = require('react');
 var Footer =
     React.createClass({displayName: "Footer",
         render:function() {
-            return React.createElement("nav", {className: "navbar navbar-default navbar"}, 
+            return React.createElement("nav", {className: "navbar navbar-default navbar top15"}, 
                     React.createElement("div", {className: "container"}, 
                         React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {className: "footer", src: "powered-by-gcp.png"})), 
                         React.createElement("a", {className: "pull-right", href: "http://facebook.github.io/react/"}, React.createElement("img", {className: "footer", src: "react_flux.png"}))
@@ -26015,8 +26020,6 @@ var Header =
                                 React.createElement("li", {className: "dropdown"}, 
                                     React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.props.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                                        React.createElement("li", null, React.createElement(Link, {href: "my-profile"}, "Profile")), 
-                                        React.createElement("li", {className: "divider"}), 
                                         React.createElement("li", null, React.createElement("a", {href: "/logout"}, "Logout"))
                                     )
                                 )
@@ -26090,24 +26093,37 @@ var MyCounts =
 
                 var detailsLink = "/count/" + item.id;
                 return (
-                    React.createElement("div", {key: item.id, className: "col-md-2 col-xs-2"}, 
-                        React.createElement("div", {className: "well"}, 
-                            React.createElement("div", {className: "row"}, 
-                                    React.createElement(Link, {href: detailsLink}, React.createElement("img", {className: "img-container", src: "numeric-over-time.png"}))
+
+                    React.createElement("div", {key: item.id, className: "col-md-3 col-lg-3 col-sm-3"}, 
+                        React.createElement("div", {className: "panel panel-primary panel panel-default"}, 
+                            React.createElement("div", {className: "panel-heading"}, 
+                                React.createElement("h3", {className: "panel-title"}, React.createElement(Link, {href: detailsLink}, item.countName))
                             ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("span", {className: "label label-default"}, item.countName)
-                            ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(null, item)}, "Delete")
+                            React.createElement("div", {className: "panel-body"}, 
+                                React.createElement("div", {className: "row"}, 
+                                    React.createElement("div", {className: "col-xs-2 col-sm-2 col-md-2 col-lg-2"}, 
+                                        React.createElement("div", {className: "row"}, 
+                                            React.createElement("div", {className: "col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2"}, 
+                                                React.createElement(Link, {href: detailsLink}, React.createElement("span", {className: "glyphicon glyphicon-stats glyph-large"}))
+                                            )
+                                        ), 
+                                        React.createElement("div", {className: "row"}, 
+                                            React.createElement("div", {className: "col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2"}, 
+                                                React.createElement("button", {data: item, className: "btn btn-danger top5", onClick: that.handleDelete.bind(null, item)}, "Delete")
+                                            )
+                                        )
+                                    )
+                                )
                             )
                         )
                     )
+
                 )
             });
 
             return React.createElement("div", {className: "page-header"}, 
-                React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting")), 
+                React.createElement("h1", null, "Things you are counting ", React.createElement("small", null, "you are counting ", this.state.myCounts.length, " things")), 
+                React.createElement("div", {className: "alert alert-warning", role: "alert"}, "Click on the name of a count to start entering values. To delete a count you've created you can click Delete"), 
                 React.createElement("div", {className: "row"}, 
                     counts
                 )
@@ -26522,13 +26538,16 @@ var API = {
     //Main namespace for API object
 };
 
+var fakeId = 0;
+
 API.getProfile = function() {
-    //request
-    //    .get('/data/profile')
-    //    .end(function(res){
-    //        AppActions.updateProfile(res.body);
-    //    });
-    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
+    request
+        .get('/data/profile')
+        .end(function(res){
+            AppActions.updateProfile(res.body);
+        });
+
+    //return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
 
 
@@ -26545,6 +26564,10 @@ API.createCount = function(countType, countName, callback, callbackObj) {
                 alert('Problem saving new count ' + res.text);
             }
         });
+    //fakeId++;
+    //AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
+    //callback.apply(callbackObj, ['/my-counts']);
+    //AppActions.updatePage('MyCounts');
 };
 
 API.getMyCounts = function() {
@@ -26553,6 +26576,7 @@ API.getMyCounts = function() {
         .end(function(res){
             AppActions.updateMyCounts(res.body);
         });
+    //AppActions.updateMyCounts([{id: 1, countType: 'test', countName: 'test'}]);
 };
 
 API.getCountDetails = function(countId) {
@@ -26561,6 +26585,7 @@ API.getCountDetails = function(countId) {
         .end(function(res){
             AppActions.updateCountDetails(merge({countId: countId}, res.body));
         });
+    //AppActions.updateCountDetails({countId: 1, countDetailsValues:[{id:1, date: "2012-01-01", value:"17"}]});
 };
 
 API.createCountValueForDetail = function(countId, date, value) {
