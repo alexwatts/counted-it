@@ -7,7 +7,7 @@ var API = {
     //Main namespace for API object
 };
 
-var localSwitch = true;
+var localSwitch = false;
 
 var fakeId = 0;
 
