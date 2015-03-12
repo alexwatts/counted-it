@@ -25498,7 +25498,6 @@ var AppActions = {
         })
     },
     deleteCount:function(count){
-        console.log('dispatching action');
         AppDispatcher.handleViewAction({
             actionType: AppConstants.DELETE_COUNT,
             count: count
@@ -25519,7 +25518,7 @@ var Template =
     React.createClass({displayName: "Template",
         render:function(){
             return (
-                React.createElement("div", {className: "container-fluid"}, 
+                React.createElement("div", {className: "container"}, 
                     React.createElement(Header, {profile: this.props.profile, page: this.props.page}), 
                     this.props.children, 
                     React.createElement(Footer, null)
@@ -25545,7 +25544,6 @@ var Router = require('react-router-component');
 var API = require('../util/api.js');
 var AppStore = require('../stores/app-store.js');
 var PageStore = require('../stores/page-store.js');
-var CountStore = require('../stores/count-store.js');
 var merge = require('react/lib/merge');
 var AppActions = require('../actions/app-actions.js');
 
@@ -25558,12 +25556,10 @@ function profile(){
 function page(){
     return {page: PageStore.getPage()}
 }
-function myCounts(){
-    return {myCounts: CountStore.getMyCounts()}
-}
 
 var App =
     React.createClass({displayName: "App",
+
         componentDidMount:function(){
             //Initialise store objects
             AppActions.updateProfile(API.getProfile());
@@ -25572,19 +25568,17 @@ var App =
             //Listen for updates from the stores
             AppStore.addChangeListener(this._onProfileChange);
             PageStore.addChangeListener(this._onPageChange);
-            CountStore.addChangeListener(this._onCountsChange);
         },
         getInitialState:function(){
             return merge(profile(), page());
         },
         _onProfileChange:function(){
-            this.setState(profile())
+            if (this.isMounted()) {
+                this.setState(profile())
+            }
         },
         _onPageChange:function(){
             this.setState(page())
-        },
-        _onCountsChange:function(){
-            this.setState(myCounts());
         },
         render:function() {
             return (
@@ -25594,7 +25588,7 @@ var App =
                         React.createElement(Location, {path: "/count", handler: CountSomething}), 
                         React.createElement(Location, {path: "/my-counts", handler: MyCounts}), 
                         React.createElement(Location, {path: "/shared-counts", handler: SharedCounts}), 
-                        React.createElement(Location, {path: "/count/:countId", handler: Count, ajw: this.state.page}), 
+                        React.createElement(Location, {path: "/count/:countId", handler: Count}), 
                         React.createElement(Location, {path: "/graph/:countId", handler: Graph}), 
                         React.createElement(Location, {path: "/my-profile", handler: MyProfile})
                     )
@@ -25605,15 +25599,19 @@ var App =
 
 module.exports = App;
 
-},{"../actions/app-actions.js":178,"../stores/app-store.js":194,"../stores/count-store.js":195,"../stores/page-store.js":197,"../util/api.js":198,"./app-template.js":179,"./count-something.js":181,"./count.js":182,"./graph.js":184,"./home.js":186,"./my-counts.js":187,"./my-profile.js":188,"./shared-counts.js":189,"react":174,"react-router-component":7,"react/lib/merge":163}],181:[function(require,module,exports){
+},{"../actions/app-actions.js":178,"../stores/app-store.js":194,"../stores/page-store.js":197,"../util/api.js":198,"./app-template.js":179,"./count-something.js":181,"./count.js":182,"./graph.js":184,"./home.js":186,"./my-counts.js":187,"./my-profile.js":188,"./shared-counts.js":189,"react":174,"react-router-component":7,"react/lib/merge":163}],181:[function(require,module,exports){
 /** @jsx React.DOM */
 var React = require('react');
 var Link = require('react-router-component').Link;
 var API = require('../util/api.js');
 var AppActions = require('../actions/app-actions.js');
+var NavigatableMixin = require('react-router-component').NavigatableMixin;
 
 var CountSomething =
     React.createClass({displayName: "CountSomething",
+
+        mixins:[NavigatableMixin],
+
         getInitialState: function () {
             return {
                 countType: '',
@@ -25626,18 +25624,22 @@ var CountSomething =
             this.setState(change);
         },
         handleClick: function (name, e) {
+
             var change = {};
             change[name] = e.target.text;
             this.setState(change);
         },
-        handleCreate: function () {
-            API.createCount(this.state.countType, this.state.countText);
-            AppActions.updatePage('MyCounts');
+        handleCreate: function (item, e) {
+            var that = this;
+            e.preventDefault();
+            API.createCount(this.state.countType, this.state.countText, this.navigate, this)
         },
+
         render:function() {
 
             return  React.createElement("div", null, 
-                        React.createElement("h1", null, " Choose something to Count"), 
+                        React.createElement("h1", null, " Create a new count"), 
+                        React.createElement("div", {className: "alert alert-warning", role: "alert"}, "Select a Count type using the Type arrow button, then enter a Name for your count eg. Weight Loss. When you've finished you can click Create Count"), 
                         React.createElement("div", {className: "row"}, 
                             React.createElement("div", {className: "col-md-12 col-xs-12"}, 
                                 React.createElement("div", {className: "input-group"}, 
@@ -25708,9 +25710,9 @@ var Count =
             DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
-                console.log('react updated my state, yay');
-            });
+            if (this.isMounted()) {
+                this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            }
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -25772,7 +25774,7 @@ var Count =
                         React.createElement("div", {className: "panel panel-default"}, 
                             React.createElement("div", {className: "panel-heading"}, 
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("img", {className: "img-container-small", src: "../numeric-over-time.png"})
+                                    React.createElement("img", {className: "img-container", src: "../numeric-over-time.png"})
                                 ), 
                                 React.createElement("div", {className: "row"}, 
                                     React.createElement("span", {className: "label label-default"}, this.state.count.countName)
@@ -25830,7 +25832,7 @@ var React = require('react');
 var Footer =
     React.createClass({displayName: "Footer",
         render:function() {
-            return React.createElement("nav", {className: "navbar navbar-default navbar"}, 
+            return React.createElement("nav", {className: "navbar navbar-default navbar top15"}, 
                     React.createElement("div", {className: "container"}, 
                         React.createElement("a", {href: "https://cloud.google.com/"}, React.createElement("img", {className: "footer", src: "powered-by-gcp.png"})), 
                         React.createElement("a", {className: "pull-right", href: "http://facebook.github.io/react/"}, React.createElement("img", {className: "footer", src: "react_flux.png"}))
@@ -25865,8 +25867,8 @@ function date(date) {
     return date;
 }
 
-var Count =
-    React.createClass({displayName: "Count",
+var Graph =
+    React.createClass({displayName: "Graph",
         componentDidMount:function() {
             //Initialise store objects
             API.getCountDetails(this.props.countId);
@@ -25876,10 +25878,9 @@ var Count =
             //DetailsStore.addChangeListener(this._onDetailsChange);
         },
         _onDetailsChange:function() {
-            this.setState(merge(countDetails(this.props.countId), count(this.props.countId)), function() {
-                console.log('react updated my state, yay');
-            });
-
+            if (this.isMounted()) {
+                this.setState(merge(countDetails(this.props.countId), count(this.props.countId)));
+            }
         },
         getInitialState:function() {
             var countObj = count(this.props.countId);
@@ -25925,8 +25926,6 @@ var Count =
         },
         renderChart: function() {
             var that = this;
-
-            console.log('debugging renderChart');
 
             var seriesData = this.getSeriesData();
 
@@ -25980,7 +25979,7 @@ var Count =
         }
     });
 
-module.exports = Count;
+module.exports = Graph;
 
 },{"../stores/count-store.js":195,"../stores/details-store.js":196,"../util/api.js":198,"moment":4,"react":174,"react-router-component":7,"react/lib/merge":163}],185:[function(require,module,exports){
 /** @jsx React.DOM */
@@ -26046,8 +26045,7 @@ var Home =
         render:function() {
             return React.createElement("div", {className: "jumbotron"}, 
                 React.createElement("h1", null, "Welcome to Counted It!"), 
-                React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
-                "in your life."), 
+                React.createElement("p", null, "Counted It is a simple concept! Create a count to track something. Then you can generate a graph of whatever you've counted and share it. You could track weight loss for example, but it really could be anything!"), 
                 React.createElement("p", null, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
@@ -26062,6 +26060,10 @@ var API = require('../util/api.js');
 var CountStore = require('../stores/count-store.js');
 var Link = require('react-router-component').Link;
 
+function myCounts(){
+    return {myCounts: CountStore.getMyCounts()}
+}
+
 var MyCounts =
     React.createClass({displayName: "MyCounts",
         getInitialState:function(){
@@ -26073,10 +26075,15 @@ var MyCounts =
         },
         componentWillMount:function(){
             //Listen for updates from the stores
-            //CountStore.addChangeListener(this._onCountsChange)
+            CountStore.addChangeListener(this._onCountsChange)
         },
         handleDelete: function (item, e) {
             API.deleteCount(item);
+        },
+        _onCountsChange:function(){
+            if (this.isMounted()) {
+                this.setState(myCounts());
+            }
         },
         render:function() {
             var that = this;
@@ -26084,24 +26091,37 @@ var MyCounts =
 
                 var detailsLink = "/count/" + item.id;
                 return (
-                    React.createElement("div", {className: "col-md-2 col-xs-2"}, 
-                        React.createElement("div", {className: "well"}, 
-                            React.createElement("div", {className: "row"}, 
-                                    React.createElement(Link, {href: detailsLink}, React.createElement("img", {className: "img-container", src: "numeric-over-time.png"}))
+
+                    React.createElement("div", {key: item.id, className: "col-md-3 col-lg-3 col-sm-3"}, 
+                        React.createElement("div", {className: "panel panel-primary panel panel-default"}, 
+                            React.createElement("div", {className: "panel-heading"}, 
+                                React.createElement("h3", {className: "panel-title"}, React.createElement(Link, {href: detailsLink}, item.countName))
                             ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("span", {className: "label label-default"}, item.countName)
-                            ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("button", {data: item, className: "btn btn-danger", onClick: that.handleDelete.bind(null, item)}, "Delete")
+                            React.createElement("div", {className: "panel-body"}, 
+                                React.createElement("div", {className: "row"}, 
+                                    React.createElement("div", {className: "col-xs-2 col-sm-2 col-md-2 col-lg-2"}, 
+                                        React.createElement("div", {className: "row"}, 
+                                            React.createElement("div", {className: "col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2"}, 
+                                                React.createElement(Link, {href: detailsLink}, React.createElement("span", {className: "glyphicon glyphicon-stats glyph-large"}))
+                                            )
+                                        ), 
+                                        React.createElement("div", {className: "row"}, 
+                                            React.createElement("div", {className: "col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2"}, 
+                                                React.createElement("button", {data: item, className: "btn btn-danger top5", onClick: that.handleDelete.bind(null, item)}, "Delete")
+                                            )
+                                        )
+                                    )
+                                )
                             )
                         )
                     )
+
                 )
             });
 
             return React.createElement("div", {className: "page-header"}, 
-                React.createElement("h1", null, "My Counts ", React.createElement("small", null, "things I am counting")), 
+                React.createElement("h1", null, "Things you are counting ", React.createElement("small", null, "you are counting ", this.state.myCounts.length, " things")), 
+                React.createElement("div", {className: "alert alert-warning", role: "alert"}, "Click on the name of a count to start entering values. To delete a count you've created you can click Delete"), 
                 React.createElement("div", {className: "row"}, 
                     counts
                 )
@@ -26310,22 +26330,15 @@ function _addCount(count){
 }
 
 function _deleteCount(count){
-    console.log(count);
-    console.log('1');
     var countsCopy = [];
-    console.log('2');
     var arrayLength = _myCounts.length;
-    console.log('3');
     for (var i = 0; i < arrayLength; i++) {
-        console.log('4');
         if (_myCounts[i].id === count.countId) {
             //dont' copy
         } else {
-            console.log('5');
             countsCopy.push(_myCounts[i]);
         }
     }
-    console.log('6');
     _myCounts = countsCopy;
 }
 
@@ -26358,7 +26371,6 @@ var CountStore = merge(EventEmitter.prototype, {
 
     dispatcherIndex:AppDispatcher.register(function(payload){
 
-        console.log('picking up action');
         var action = payload.action; // this is our action from handleViewAction
         switch(action.actionType){
             case AppConstants.COUNT_ADDED:
@@ -26371,9 +26383,7 @@ var CountStore = merge(EventEmitter.prototype, {
                 _deleteCount(payload.action.count);
                 break;
         }
-        console.log('emmitting change');
         CountStore.emitChange();
-        console.log('change emitted');
         return true;
     })
 });
@@ -26526,35 +26536,46 @@ var API = {
     //Main namespace for API object
 };
 
+var fakeId = 0;
+
 API.getProfile = function() {
-    request
-        .get('/data/profile')
-        .end(function(res){
-            AppActions.updateProfile(res.body);
-        });
+    //request
+    //    .get('/data/profile')
+    //    .end(function(res){
+    //        AppActions.updateProfile(res.body);
+    //    });
+    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
 
-API.createCount = function(countType, countName, callback) {
-    request
-        .post('data/count')
-        .send({ countType: countType, countName: countName })
-        .set('Accept', 'application/json')
-        .end(function(res){
-            if (res.ok) {
-                callback.apply('/my-counts');
-                //AppActions.countAdded(res.body);
-            } else {
-                alert('Problem saving new count ' + res.text);
-            }
-        });
+
+API.createCount = function(countType, countName, callback, callbackObj) {
+    //request
+    //    .post('data/count')
+    //    .send({ countType: countType, countName: countName })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            callback.apply(callbackObj, ['/my-counts']);
+    //            AppActions.updatePage('MyCounts');
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+    fakeId++;
+    AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
+    callback.apply(callbackObj, ['/my-counts']);
+    AppActions.updatePage('MyCounts');
 };
 
 API.getMyCounts = function() {
-    request
-        .get('/data/my-counts')
-        .end(function(res){
-            AppActions.updateMyCounts(res.body);
-        });
+    //request
+    //    .get('/data/my-counts')
+    //    .end(function(res){
+    //        AppActions.updateMyCounts(res.body);
+    //    });
+    AppActions.updateMyCounts([{id: 1, countType: 'test', countName: 'test'}]);
+
+    //AppActions.updateMyCounts(CountStore.getMyCounts());
 };
 
 API.getCountDetails = function(countId) {

@@ -7,35 +7,46 @@ var API = {
     //Main namespace for API object
 };
 
+var fakeId = 0;
+
 API.getProfile = function() {
-    request
-        .get('/data/profile')
-        .end(function(res){
-            AppActions.updateProfile(res.body);
-        });
+    //request
+    //    .get('/data/profile')
+    //    .end(function(res){
+    //        AppActions.updateProfile(res.body);
+    //    });
+    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
 
+
 API.createCount = function(countType, countName, callback, callbackObj) {
-    request
-        .post('data/count')
-        .send({ countType: countType, countName: countName })
-        .set('Accept', 'application/json')
-        .end(function(res){
-            if (res.ok) {
-                callback.apply(callbackObj, ['/my-counts']);
-                AppActions.updatePage('MyCounts');
-            } else {
-                alert('Problem saving new count ' + res.text);
-            }
-        });
+    //request
+    //    .post('data/count')
+    //    .send({ countType: countType, countName: countName })
+    //    .set('Accept', 'application/json')
+    //    .end(function(res){
+    //        if (res.ok) {
+    //            callback.apply(callbackObj, ['/my-counts']);
+    //            AppActions.updatePage('MyCounts');
+    //        } else {
+    //            alert('Problem saving new count ' + res.text);
+    //        }
+    //    });
+    fakeId++;
+    AppActions.countAdded({id: fakeId, countType: countType, countName: countName});
+    callback.apply(callbackObj, ['/my-counts']);
+    AppActions.updatePage('MyCounts');
 };
 
 API.getMyCounts = function() {
-    request
-        .get('/data/my-counts')
-        .end(function(res){
-            AppActions.updateMyCounts(res.body);
-        });
+    //request
+    //    .get('/data/my-counts')
+    //    .end(function(res){
+    //        AppActions.updateMyCounts(res.body);
+    //    });
+    AppActions.updateMyCounts([{id: 1, countType: 'test', countName: 'test'}]);
+
+    //AppActions.updateMyCounts(CountStore.getMyCounts());
 };
 
 API.getCountDetails = function(countId) {

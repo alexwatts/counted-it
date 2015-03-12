@@ -35,24 +35,37 @@ var MyCounts =
 
                 var detailsLink = "/count/" + item.id;
                 return (
-                    <div key={item.id} className="col-md-2 col-xs-2">
-                        <div className="well">
-                            <div className="row">
-                                    <Link href={detailsLink}><img className="img-container" src="numeric-over-time.png"></img></Link>
+
+                    <div key={item.id} className="col-md-3 col-lg-3 col-sm-3">
+                        <div  className="panel panel-primary panel panel-default">
+                            <div className="panel-heading">
+                                <h3 className="panel-title"><Link href={detailsLink}>{item.countName}</Link></h3>
                             </div>
-                            <div className="row">
-                                <span className="label label-default">{item.countName}</span>
-                            </div>
-                            <div className="row">
-                                <button data={item} className="btn btn-danger" onClick={that.handleDelete.bind(null, item)}>Delete</button>
+                            <div className="panel-body">
+                                <div className="row">
+                                    <div className="col-xs-2 col-sm-2 col-md-2 col-lg-2">
+                                        <div className="row">
+                                            <div className="col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+                                                <Link href={detailsLink}><span className="glyphicon glyphicon-stats glyph-large"></span></Link>
+                                            </div>
+                                        </div>
+                                        <div className="row">
+                                            <div className="col-xs-offset-2 col-sm-offset-2 col-md-offset-2 col-lg-offset-2">
+                                                <button data={item} className="btn btn-danger top5" onClick={that.handleDelete.bind(null, item)}>Delete</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
                 )
             });
 
             return <div className="page-header">
-                <h1>My Counts <small>things I am counting</small></h1>
+                <h1>Things you are counting <small>you are counting {this.state.myCounts.length} things</small></h1>
+                <div className="alert alert-warning" role="alert">Click on the name of a count to start entering values. To delete a count you've created you can click Delete</div>
                 <div className="row">
                     {counts}
                 </div>

@@ -1,3 +1,7 @@
+input[type="date"]::-webkit-clear-button {
+    display: none;
+}
+
 .footer{ height: 80px}
 
 .top5 { margin-top:5px; }
@@ -26,6 +30,16 @@
     max-width:50px;
 }
 
-.glyphicon-lrg {
-    font-size: 5.0em;
+.img-container-large{
+    width:230px;
+    height: auto;
+}
+
+.glyph-large {
+    font-size: 2.2em;
+}
+
+.col-centered{
+    float: none;
+    margin: 0 auto;
 }

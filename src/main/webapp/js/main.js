@@ -25926,8 +25926,6 @@ var Graph =
         renderChart: function() {
             var that = this;
 
-            console.log('debugging renderChart');
-
             var seriesData = this.getSeriesData();
 
             var node = this.refs.chartNode.getDOMNode();
@@ -26046,8 +26044,7 @@ var Home =
         render:function() {
             return React.createElement("div", {className: "jumbotron"}, 
                 React.createElement("h1", null, "Welcome to Counted It!"), 
-                React.createElement("p", null, "Counted It is a new unique place where you can count the things that are happening" + ' ' +
-                "in your life."), 
+                React.createElement("p", null, "Counted It is a simple concept! Create a count to track something. Then you can generate a graph of whatever you've counted and share it. You could track weight loss for example, but it really could be anything!"), 
                 React.createElement("p", null, React.createElement(Link, {onClick: this.handleNav.bind(null, 'CountSomething'), className: "btn btn-primary btn-lg", href: "/count", role: "button"}, "Start Counting"))
             )
         }
@@ -26526,12 +26523,14 @@ var API = {
 };
 
 API.getProfile = function() {
-    request
-        .get('/data/profile')
-        .end(function(res){
-            AppActions.updateProfile(res.body);
-        });
+    //request
+    //    .get('/data/profile')
+    //    .end(function(res){
+    //        AppActions.updateProfile(res.body);
+    //    });
+    return {'stat':'ok','profile':{'providerName':'Google+','identifier':'https:\/\/www.google.com\/profiles\/109824759333308411017','displayName':'alex watts','name':{'formatted':'alex watts','givenName':'alex','familyName':'watts'},'url':'https:\/\/plus.google.com\/109824759333308411017','photo':'https:\/\/lh3.googleusercontent.com\/-XdUIqdMkCWA\/AAAAAAAAAAI\/AAAAAAAAAAA\/4252rscbv5M\/photo.jpg?sz=400','gender':'male','googleUserId':'109824759333308411017','providerSpecifier':'googleplus'}};
 };
+
 
 API.createCount = function(countType, countName, callback, callbackObj) {
     request

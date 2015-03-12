@@ -36,7 +36,8 @@ var CountSomething =
         render:function() {
 
             return  <div>
-                        <h1> Choose something to Count</h1>
+                        <h1> Create a new count</h1>
+                        <div className="alert alert-warning" role="alert">Select a Count type using the Type arrow button, then enter a Name for your count eg. Weight Loss. When you've finished you can click Create Count</div>
                         <div className="row">
                             <div className="col-md-12 col-xs-12">
                                 <div className="input-group">

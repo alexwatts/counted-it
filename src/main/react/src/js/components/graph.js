@@ -80,8 +80,6 @@ var Graph =
         renderChart: function() {
             var that = this;
 
-            console.log('debugging renderChart');
-
             var seriesData = this.getSeriesData();
 
             var node = this.refs.chartNode.getDOMNode();
