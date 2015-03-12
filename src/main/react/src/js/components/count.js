@@ -97,10 +97,23 @@ var Count =
                         <div className="panel panel-default">
                             <div className="panel-heading">
                                 <div className="row">
-                                    <img className="img-container" src="../numeric-over-time.png"></img>
+                                    <span className="glyphicon glyphicon-stats glyph-large"></span>
                                 </div>
+
                                 <div className="row">
-                                    <span className="label label-default">{this.state.count.countName}</span>
+                                    <h2> {this.state.count.countName} - <small>You have {this.state.countDetails.countDetailsValues.length} recorded values</small> </h2>
+
+                                    <div className="row">
+                                        <div className="col-md-12 col-xs-12">
+                                            <Link  className="btn btn-primary minw200" href={showGraphLink} role="button">Show Graph</Link>
+                                        </div>
+                                    </div>
+
+                                    <ul className="list-group">
+                                        {counts}
+                                        {counts}
+                                    </ul>
+
                                 </div>
                             </div>
                             <div className="panel-body">
@@ -132,15 +145,6 @@ var Count =
                                     </div>
                                 </p>
                             </div>
-                            <div className="row">
-                                <div className="col-md-12 col-xs-12">
-                                    <Link  className="btn btn-primary minw200" href={showGraphLink} role="button">Show Graph</Link>
-                                </div>
-                            </div>
-                            <h1> Previously recorded values</h1>
-                            <ul className="list-group">
-                                {counts}
-                            </ul>
                         </div>
                     </div>
         }

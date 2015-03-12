@@ -32,8 +32,6 @@ var Header =
                                 <li className="dropdown">
                                     <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">{this.props.profile.profile.displayName}<span className="caret"></span></a>
                                     <ul className="dropdown-menu" role="menu">
-                                        <li><Link href="my-profile">Profile</Link></li>
-                                        <li className="divider"></li>
                                         <li><a href="/logout">Logout</a></li>
                                     </ul>
                                 </li>

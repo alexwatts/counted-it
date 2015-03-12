@@ -25774,10 +25774,23 @@ var Count =
                         React.createElement("div", {className: "panel panel-default"}, 
                             React.createElement("div", {className: "panel-heading"}, 
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("img", {className: "img-container", src: "../numeric-over-time.png"})
+                                    React.createElement("span", {className: "glyphicon glyphicon-stats glyph-large"})
                                 ), 
+
                                 React.createElement("div", {className: "row"}, 
-                                    React.createElement("span", {className: "label label-default"}, this.state.count.countName)
+                                    React.createElement("h2", null, " ", this.state.count.countName, " - ", React.createElement("small", null, "You have ", this.state.countDetails.countDetailsValues.length, " recorded values"), " "), 
+
+                                    React.createElement("div", {className: "row"}, 
+                                        React.createElement("div", {className: "col-md-12 col-xs-12"}, 
+                                            React.createElement(Link, {className: "btn btn-primary minw200", href: showGraphLink, role: "button"}, "Show Graph")
+                                        )
+                                    ), 
+
+                                    React.createElement("ul", {className: "list-group"}, 
+                                        counts, 
+                                        counts
+                                    )
+
                                 )
                             ), 
                             React.createElement("div", {className: "panel-body"}, 
@@ -25808,15 +25821,6 @@ var Count =
                                         )
                                     )
                                 )
-                            ), 
-                            React.createElement("div", {className: "row"}, 
-                                React.createElement("div", {className: "col-md-12 col-xs-12"}, 
-                                    React.createElement(Link, {className: "btn btn-primary minw200", href: showGraphLink, role: "button"}, "Show Graph")
-                                )
-                            ), 
-                            React.createElement("h1", null, " Previously recorded values"), 
-                            React.createElement("ul", {className: "list-group"}, 
-                                counts
                             )
                         )
                     )
@@ -26016,8 +26020,6 @@ var Header =
                                 React.createElement("li", {className: "dropdown"}, 
                                     React.createElement("a", {href: "#", className: "dropdown-toggle", "data-toggle": "dropdown", role: "button", "aria-expanded": "false"}, this.props.profile.profile.displayName, React.createElement("span", {className: "caret"})), 
                                     React.createElement("ul", {className: "dropdown-menu", role: "menu"}, 
-                                        React.createElement("li", null, React.createElement(Link, {href: "my-profile"}, "Profile")), 
-                                        React.createElement("li", {className: "divider"}), 
                                         React.createElement("li", null, React.createElement("a", {href: "/logout"}, "Logout"))
                                     )
                                 )
@@ -26579,11 +26581,12 @@ API.getMyCounts = function() {
 };
 
 API.getCountDetails = function(countId) {
-    request
-        .get('/data/count/' + countId + '/details')
-        .end(function(res){
-            AppActions.updateCountDetails(merge({countId: countId}, res.body));
-        });
+    //request
+    //    .get('/data/count/' + countId + '/details')
+    //    .end(function(res){
+    //        AppActions.updateCountDetails(merge({countId: countId}, res.body));
+    //    });
+    AppActions.updateCountDetails({countId: 1, countDetailsValues:[{id:1, date: "2012-01-01", value:"17"}]});
 };
 
 API.createCountValueForDetail = function(countId, date, value) {

@@ -50,11 +50,12 @@ API.getMyCounts = function() {
 };
 
 API.getCountDetails = function(countId) {
-    request
-        .get('/data/count/' + countId + '/details')
-        .end(function(res){
-            AppActions.updateCountDetails(merge({countId: countId}, res.body));
-        });
+    //request
+    //    .get('/data/count/' + countId + '/details')
+    //    .end(function(res){
+    //        AppActions.updateCountDetails(merge({countId: countId}, res.body));
+    //    });
+    AppActions.updateCountDetails({countId: 1, countDetailsValues:[{id:1, date: "2012-01-01", value:"17"}]});
 };
 
 API.createCountValueForDetail = function(countId, date, value) {
