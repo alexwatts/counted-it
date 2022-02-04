@@ -5,8 +5,6 @@ This repository contains a server side Google App Engine project and a React+Flu
 The project itself is a site I have built for the purpose of learning these technologies. It's a site that lets users
 track things (like weight loss) and generate graphs. The site is integrated with Facebook, Twitter and Google+.
 
-You can see a deployed version of this site at http://counted.it
-
 Development Instructions.
 =============================
 
